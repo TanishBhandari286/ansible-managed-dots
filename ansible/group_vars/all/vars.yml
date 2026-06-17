@@ -1,0 +1,24 @@
+---
+# ---------------------------------------------------------------------------
+# Global variables — available to ALL hosts
+# ---------------------------------------------------------------------------
+
+# Absolute path to the root of this cloned dotfiles repository.
+# Uses ansible_facts['env']['HOME'] so this resolves to the correct HOME
+# on each target host (remote Linux or local macOS) rather than the control node.
+dotfiles_dir: "{{ ansible_facts['env']['HOME'] }}/dots"
+
+# ---------------------------------------------------------------------------
+# SSH Key Configuration
+# ---------------------------------------------------------------------------
+
+# M2M automation key — passphraseless, used by Ansible for all remote connections.
+# This key must be present in authorized_keys on every Linux target.
+ssh_automation_key: id_ed25519_ansible
+
+# FIDO2 interactive key pairs — deployed to ~/.ssh/ on macOS only.
+# These are for human-facing SSH sessions and Git commit signing.
+# Private keys are ansible-vault encrypted in the repo.
+ssh_key_pairs:
+  - id_ed25519_sk_key1
+  - id_ed25519_sk_key2

@@ -1,0 +1,79 @@
+---
+# ---------------------------------------------------------------------------
+# Role: dotfiles_mac — Symlink macOS-specific config files
+# ---------------------------------------------------------------------------
+# Symlinking strategy: for each target that may already exist as a real
+# directory (populated by apps on first launch), we first remove it, then
+# create the symlink. ansible.builtin.file state=link with force: true handles
+# missing targets and broken symlinks, but refuses non-empty directories.
+# ---------------------------------------------------------------------------
+
+# ---- Ensure ~/.config exists -----------------------------------------------
+- name: Ensure ~/.config directory exists
+  ansible.builtin.file:
+    path: "{{ user_home }}/.config"
+    state: directory
+    mode: "0755"
+
+# ---- AeroSpace -------------------------------------------------------------
+- name: Remove existing ~/.config/aerospace directory if present
+  ansible.builtin.file:
+    path: "{{ user_home }}/.config/aerospace"
+    state: absent
+  tags: [aerospace]
+
+- name: Symlink ~/.config/aerospace
+  ansible.builtin.file:
+    src: "{{ dotfiles_dir }}/.config/aerospace"
+    dest: "{{ user_home }}/.config/aerospace"
+    state: link
+    force: true
+  tags: [aerospace]
+
+# ---- Ghostty ---------------------------------------------------------------
+- name: Remove existing ~/.config/ghostty directory if present
+  ansible.builtin.file:
+    path: "{{ user_home }}/.config/ghostty"
+    state: absent
+  tags: [ghostty]
+
+- name: Symlink ~/.config/ghostty
+  ansible.builtin.file:
+    src: "{{ dotfiles_dir }}/.config/ghostty"
+    dest: "{{ user_home }}/.config/ghostty"
+    state: link
+    force: true
+  tags: [ghostty]
+
+# ---- Neovim ----------------------------------------------------------------
+- name: Remove existing ~/.config/nvim directory if present
+  ansible.builtin.file:
+    path: "{{ user_home }}/.config/nvim"
+    state: absent
+  tags: [nvim]
+
+- name: Symlink ~/.config/nvim
+  ansible.builtin.file:
+    src: "{{ dotfiles_dir }}/.config/nvim"
+    dest: "{{ user_home }}/.config/nvim"
+    state: link
+    force: true
+  tags: [nvim]
+
+# ---- Starship --------------------------------------------------------------
+- name: Symlink ~/.config/starship.toml
+  ansible.builtin.file:
+    src: "{{ dotfiles_dir }}/starship.toml"
+    dest: "{{ user_home }}/.config/starship.toml"
+    state: link
+    force: true
+  tags: [starship]
+
+# ---- Home-directory symlinks ------------------------------------------------
+- name: Symlink ~/.gitconfig
+  ansible.builtin.file:
+    src: "{{ dotfiles_dir }}/git/.gitconfig"
+    dest: "{{ user_home }}/.gitconfig"
+    state: link
+    force: true
+  tags: [git]

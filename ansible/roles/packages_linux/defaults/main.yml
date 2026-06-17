@@ -1,0 +1,21 @@
+---
+# ---------------------------------------------------------------------------
+# Default variables for the packages_linux role
+# Override in group_vars/linux/vars.yml or host_vars/<host>.yml
+# ---------------------------------------------------------------------------
+
+linux_packages:
+  - zsh
+  - git
+  - curl
+  - wget
+  - unzip
+  - ripgrep
+  - fd-find
+  - fzf
+  - tmux
+  - htop
+  - neovim
+  - python3
+  - python3-pip
+  - build-essential

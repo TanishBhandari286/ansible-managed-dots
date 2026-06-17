@@ -1,0 +1,28 @@
+---
+# ---------------------------------------------------------------------------
+# Role: packages_linux — Install essential apt packages on Ubuntu/Debian
+# ---------------------------------------------------------------------------
+
+- name: Install base packages
+  ansible.builtin.apt:
+    name: "{{ linux_packages }}"
+    state: present
+    update_cache: false   # cache already updated in playbook pre_tasks
+  become: true
+
+- name: Install Neovim AppImage (latest stable) if nvim not in apt
+  block:
+    - name: Check nvim version available in apt
+      ansible.builtin.command: apt-cache show neovim
+      register: apt_nvim_check
+      failed_when: false
+      changed_when: false
+
+    - name: Download Neovim AppImage when not in apt repos
+      ansible.builtin.get_url:
+        url: https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage
+        dest: /usr/local/bin/nvim
+        mode: "0755"
+      become: true
+      when: apt_nvim_check.rc != 0
+  tags: [nvim]

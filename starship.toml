@@ -1,0 +1,56 @@
+# ~/.config/starship.toml
+
+# Detached solid-color powerline format
+format = """
+$os\
+$hostname\
+$directory\
+$git_branch\
+$git_status\
+$nodejs\
+$kubernetes\
+\n$character"""
+# Rosé Pine Palette
+palette = 'rose_pine'
+
+[palettes.rose_pine]
+base = '#191724'
+overlay = '#26233a'
+text = '#e0def4'
+love = '#eb6f92'
+gold = '#f6c177'
+rose = '#ebbcba'
+pine = '#31748f'
+foam = '#9ccfd8'
+iris = '#c4a7e7'
+
+[os]
+disabled = false
+format = "[  ](bg:pine fg:base)[](fg:pine) "
+
+[hostname]
+ssh_only = true
+format = "[ 󰒋 $hostname ](bg:love fg:base)[](fg:love) "
+
+[directory]
+format = "[  $path ](bg:overlay fg:text)[](fg:overlay) "
+truncation_length = 3
+truncate_to_repo = true
+
+[git_branch]
+format = "[  $branch ](bg:rose fg:base)[](fg:rose) "
+
+[git_status]
+format = "[$all_status$ahead_behind ](fg:love)"
+
+[nodejs]
+format = "[  $version ](bg:gold fg:base)[](fg:gold) "
+
+[kubernetes]
+disabled = false
+format = "[ 󱃾 $context ](bg:foam fg:base)[](fg:foam) "
+
+[character]
+success_symbol = "[❯](bold pine)"
+error_symbol = "[❯](bold love)"
+vimcmd_symbol = "[❮](bold gold)"

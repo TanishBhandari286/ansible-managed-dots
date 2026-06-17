@@ -1,0 +1,32 @@
+---
+# ---------------------------------------------------------------------------
+# macOS Provisioning Playbook
+# ---------------------------------------------------------------------------
+# Run: cd ~/dots/ansible && ansible-playbook playbooks/mac.yml
+# ---------------------------------------------------------------------------
+
+- name: Provision macOS workstation
+  hosts: mac
+  gather_facts: true
+  become: false   # macOS provisioning runs as the standard user throughout.
+                  # Homebrew, dotfiles, and SSH keys must NOT run as root.
+                  # Individual tasks that need sudo should opt in explicitly.
+
+  pre_tasks:
+    - name: Verify we are running on macOS
+      ansible.builtin.assert:
+        that: ansible_facts['os_family'] == "Darwin"
+        fail_msg: "This playbook is for macOS only. Use linux.yml for Linux hosts."
+
+  roles:
+    - role: homebrew
+      tags: [homebrew, brew]
+
+    - role: shell
+      tags: [shell, zsh]
+
+    - role: dotfiles_mac
+      tags: [dotfiles, symlinks, config]
+
+    - role: ssh_mac
+      tags: [ssh, keys]

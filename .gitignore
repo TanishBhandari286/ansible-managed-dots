@@ -1,0 +1,39 @@
+# =============================================================================
+# .gitignore — Dotfiles Repository
+# =============================================================================
+
+# --- Ansible secrets ---------------------------------------------------------
+# NEVER commit the vault password file or any unencrypted private keys
+ansible/.vault_pass
+*.vault_pass
+
+# Private SSH keys — only encrypted copies belong in the repo
+# (Public .pub files are safe to commit)
+ssh_keys/id_ed25519_sk_key1
+ssh_keys/id_ed25519_sk_key2
+ssh_keys/id_ed25519_sk_key3
+ssh_keys/id_ed25519_sk_key4
+
+# --- Ansible runtime artifacts -----------------------------------------------
+ansible/*.retry
+ansible/.cache/
+ansible/fact_cache/
+
+# --- macOS artifacts ---------------------------------------------------------
+.DS_Store
+**/.DS_Store
+.AppleDouble
+.LSOverride
+
+# --- Editors -----------------------------------------------------------------
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# --- Python ------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+.env
+.venv/

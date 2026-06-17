@@ -1,0 +1,30 @@
+---
+# ---------------------------------------------------------------------------
+# Global variables — available to ALL hosts
+# ---------------------------------------------------------------------------
+
+# OS-aware home directory — single source of truth used by all roles.
+# Always resolves to a fully absolute path. NO tildes (~) are used anywhere —
+# tildes are expanded by the shell, not by Ansible's Python runtime, and cause
+# literal directories named "~username" to be created when become is active.
+# macOS: /Users/<user_id>   Linux: /home/<ansible_user || user_id>
+user_home: "{{ '/Users/' + ansible_facts['user_id'] if ansible_facts['os_family'] == 'Darwin' else '/home/' + (ansible_user | default(ansible_facts['user_id'])) }}"
+
+# Absolute path to the cloned dotfiles repo on each target host.
+# Derived from user_home so it automatically resolves correctly on macOS and Linux.
+dotfiles_dir: "{{ user_home }}/dots"
+
+# ---------------------------------------------------------------------------
+# SSH Key Configuration
+# ---------------------------------------------------------------------------
+
+# M2M automation key — passphraseless, used by Ansible for all remote connections.
+# This key must be present in authorized_keys on every Linux target.
+ssh_automation_key: id_ed25519_ansible
+
+# FIDO2 interactive key pairs — deployed to ~/.ssh/ on macOS only.
+# These are for human-facing SSH sessions and Git commit signing.
+# Private keys are ansible-vault encrypted in the repo.
+ssh_key_pairs:
+  - id_ed25519_sk_key1
+  - id_ed25519_sk_key2

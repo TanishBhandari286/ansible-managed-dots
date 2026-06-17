@@ -1,0 +1,17 @@
+# --- Global Network Defaults ---
+Host *
+    IdentitiesOnly yes
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
+
+# --- Cloud Infrastructure ---
+Host vps
+    HostName 69.62.77.27
+    User vps
+    IdentityFile ~/.ssh/id_ed25519_sk_key1
+    IdentityAgent none
+# GitHub Authentication using FIDO2 Keys
+Host github.com
+    IdentityFile ~/.ssh/id_ed25519_sk_key1
+    IdentityFile ~/.ssh/id_ed25519_sk_key2
+    IdentitiesOnly yes

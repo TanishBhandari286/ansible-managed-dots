@@ -1,0 +1,121 @@
+tap "barutsrb/tap", trusted: true
+tap "domt4/autoupdate", trusted: true
+tap "nikitabobko/tap", trusted: true
+tap "tw93/tap", trusted: true
+# Simple, modern, secure file encryption
+brew "age"
+# Clone of cat(1) with syntax highlighting and Git integration
+brew "bat"
+# Toolchain of the web
+brew "biome"
+# Modern, maintained replacement for ls
+brew "eza"
+# Simple, fast and user-friendly alternative to find
+brew "fd"
+# Command-line fuzzy finder written in Go
+brew "fzf"
+# GNU compiler collection
+brew "gcc"
+# Distributed revision control system
+brew "git"
+# Improved top (interactive process viewer)
+brew "htop"
+# Lazier way to manage everything docker
+brew "lazydocker"
+# Simple terminal UI for git commands
+brew "lazygit"
+# Interpreted, interactive, object-oriented programming language
+brew "python@3.14"
+# Deep clean and optimize your Mac
+brew "mole"
+# Incremental parsing library
+brew "tree-sitter"
+# Ambitious Vim-fork focused on extensibility and agility
+brew "neovim"
+# Open-source, cross-platform JavaScript runtime environment
+brew "node"
+# OpenBSD freely-licensed SSH connectivity tools
+brew "openssh"
+# Quick and easy command-line file transfer utility from any computer to another
+brew "portal"
+# Search tool like grep and The Silver Searcher
+brew "ripgrep"
+# Graphical command-line client for SSH
+brew "sshs"
+# Cross-shell prompt for astronauts
+brew "starship"
+# Organize software neatly under a single directory tree (e.g. /usr/local)
+brew "stow"
+# Terminal multiplexer
+brew "tmux"
+# Display directories as trees (with optional color/HTML output)
+brew "tree"
+# Internet file retriever
+brew "wget"
+# Tool for managing your YubiKey configuration
+brew "ykman"
+# Shell extension to navigate your filesystem faster
+brew "zoxide"
+brew "ansible"
+# Fish-like fast/unobtrusive autosuggestions for zsh
+brew "zsh-autosuggestions"
+# Additional completion definitions for zsh
+brew "zsh-completions"
+# Fish shell like syntax highlighting for zsh
+brew "zsh-syntax-highlighting"
+# AeroSpace is an i3-like tiling window manager for macOS
+cask "nikitabobko/tap/aerospace"
+# Agent orchestration platform
+cask "antigravity"
+# Web browser focusing on privacy
+cask "brave-browser"
+# Time tracking tool for agencies and freelancers
+cask "clockify"
+# Web browser
+cask "firefox"
+cask "font-jetbrains-mono"
+# Terminal emulator that uses platform-native UI and GPU acceleration
+cask "ghostty"
+# Free and open-source media player
+cask "iina"
+# Open-source software for live streaming and screen recording
+cask "obs"
+# Knowledge base that works on top of a local folder of plain text Markdown files
+cask "obsidian"
+# Tiling window manager for macOS with Niri-inspired column-based layout
+cask "barutsrb/tap/omniwm"
+# Replacement for Docker Desktop
+cask "orbstack"
+# Client for Proton Drive
+cask "proton-drive"
+# Client for Proton Mail and Proton Calendar
+cask "proton-mail"
+# Desktop client for Proton Pass
+cask "proton-pass"
+# VPN client focusing on security
+cask "protonvpn"
+# All-in-one bookmark manager
+cask "raindropio"
+# Control your tools with a few keystrokes
+cask "raycast"
+# Music streaming service
+cask "spotify"
+# Open-source media center
+cask "stremio"
+# Open-source code editor
+cask "visual-studio-code"
+# Native desktop client for WhatsApp
+cask "whatsapp"
+vscode "biomejs.biome"
+vscode "formulahendry.code-runner"
+vscode "ms-azuretools.vscode-containers"
+vscode "ms-kubernetes-tools.vscode-kubernetes-tools"
+vscode "ms-vscode-remote.remote-containers"
+vscode "ms-vscode.cpp-devtools"
+vscode "ms-vscode.cpptools"
+vscode "oderwat.indent-rainbow"
+vscode "redhat.vscode-yaml"
+vscode "rishitmohanty3.leetcode-dark"
+vscode "tal7aouy.rainbow-bracket"
+npm "eslint"
+npm "tree-sitter-cli"

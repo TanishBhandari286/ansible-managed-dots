@@ -1,0 +1,45 @@
+---
+# ---------------------------------------------------------------------------
+# Role: homebrew — Install Homebrew (if absent) and run Brewfile
+# ---------------------------------------------------------------------------
+
+- name: Check if Homebrew is already installed
+  ansible.builtin.stat:
+    path: /opt/homebrew/bin/brew # Apple Silicon path
+  register: brew_stat_arm
+
+- name: Check if Homebrew is installed (Intel fallback)
+  ansible.builtin.stat:
+    path: /usr/local/bin/brew
+  register: brew_stat_intel
+
+- name: Install Homebrew
+  ansible.builtin.shell: |
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  become: false # Homebrew installer refuses to run as root
+  when:
+    - not brew_stat_arm.stat.exists
+    - not brew_stat_intel.stat.exists
+  environment:
+    NONINTERACTIVE: "1"
+
+# Resolve the correct brew binary path
+- name: Set brew binary path (Apple Silicon)
+  ansible.builtin.set_fact:
+    brew_bin: /opt/homebrew/bin/brew
+  when: brew_stat_arm.stat.exists or ansible_facts['architecture'] == "arm64"
+
+- name: Set brew binary path (Intel)
+  ansible.builtin.set_fact:
+    brew_bin: /usr/local/bin/brew
+  when:
+    - brew_bin is not defined
+    - brew_stat_intel.stat.exists or ansible_facts['architecture'] == "x86_64"
+
+- name: Install Brewfile bundle
+  ansible.builtin.command:
+    cmd: "{{ brew_bin }} bundle --file={{ dotfiles_dir }}/.config/Brewfile"
+  become: false # Homebrew panics and aborts when executed as root
+  register: brew_bundle_result
+  changed_when: "'Installing' in brew_bundle_result.stdout or 'Upgrading' in brew_bundle_result.stdout"
+  tags: [brew_bundle]

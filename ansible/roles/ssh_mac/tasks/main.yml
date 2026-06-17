@@ -1,0 +1,63 @@
+---
+# ---------------------------------------------------------------------------
+# Role: ssh_mac — Deploy all SSH keys and config to macOS ~/.ssh/
+# ---------------------------------------------------------------------------
+# Two key categories are managed:
+#   1. id_ed25519_ansible  — passphraseless M2M automation key (vault-encrypted)
+#   2. id_ed25519_sk_key*  — FIDO2/YubiKey interactive keys (vault-encrypted)
+# ---------------------------------------------------------------------------
+
+# ---- Ensure ~/.ssh is private -----------------------------------------------
+- name: Ensure ~/.ssh directory exists with correct permissions
+  ansible.builtin.file:
+    path: "{{ user_home }}/.ssh"
+    state: directory
+    mode: "0700"
+
+# ---- SSH client config (plaintext, no vault needed) -------------------------
+- name: Deploy SSH client config
+  ansible.builtin.copy:
+    src: "{{ dotfiles_dir }}/ssh_keys/config"
+    dest: "{{ user_home }}/.ssh/config"
+    mode: "0600"
+    backup: true
+  tags: [ssh_config]
+
+# ---- M2M automation key (vault-encrypted private key) -----------------------
+- name: Deploy automation private key (id_ed25519_ansible)
+  ansible.builtin.copy:
+    src: "{{ dotfiles_dir }}/ssh_keys/{{ ssh_automation_key }}"
+    dest: "{{ user_home }}/.ssh/{{ ssh_automation_key }}"
+    mode: "0600"
+    backup: true
+  no_log: true
+  tags: [ssh_keys_private, ssh_automation]
+
+- name: Deploy automation public key (id_ed25519_ansible.pub)
+  ansible.builtin.copy:
+    src: "{{ dotfiles_dir }}/ssh_keys/{{ ssh_automation_key }}.pub"
+    dest: "{{ user_home }}/.ssh/{{ ssh_automation_key }}.pub"
+    mode: "0644"
+    backup: true
+  tags: [ssh_keys_public, ssh_automation]
+
+# ---- FIDO2 interactive private keys (vault-encrypted) -----------------------
+- name: Deploy FIDO2 private SSH keys
+  ansible.builtin.copy:
+    src: "{{ dotfiles_dir }}/ssh_keys/{{ item }}"
+    dest: "{{ user_home }}/.ssh/{{ item }}"
+    mode: "0600"
+    backup: true
+  loop: "{{ ssh_key_pairs }}"
+  no_log: true
+  tags: [ssh_keys_private, ssh_fido]
+
+# ---- FIDO2 public keys (plaintext) ------------------------------------------
+- name: Deploy FIDO2 public SSH keys
+  ansible.builtin.copy:
+    src: "{{ dotfiles_dir }}/ssh_keys/{{ item }}.pub"
+    dest: "{{ user_home }}/.ssh/{{ item }}.pub"
+    mode: "0644"
+    backup: true
+  loop: "{{ ssh_key_pairs }}"
+  tags: [ssh_keys_public, ssh_fido]

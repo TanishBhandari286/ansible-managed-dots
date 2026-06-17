@@ -1,0 +1,36 @@
+---
+# ---------------------------------------------------------------------------
+# Role: ssh_linux — Insert FIDO2 public keys into authorized_keys
+# ---------------------------------------------------------------------------
+# SECURITY: Only PUBLIC keys are read. Private keys and the SSH config
+# file are NEVER copied to remote Linux hosts.
+# ---------------------------------------------------------------------------
+
+- name: Ensure ~/.ssh directory exists on remote host
+  ansible.builtin.file:
+    path: "{{ user_home }}/.ssh"
+    state: directory
+    mode: "0700"
+
+# lookup('file') always runs on the control node (Mac). We build the path
+# from lookup('env', 'HOME') — the Mac's local $HOME — not dotfiles_dir,
+# which points to the remote user's home and is unreachable from localhost.
+#
+# user: resolution strategy: we run whoami on the remote host at execution time
+# to get the real /etc/passwd username. This bypasses:
+#   - ansible_facts['user_id']  → cached as 'root' from the become: true phase
+#   - ansible_user              → inventory alias, may not match /etc/passwd entry
+- name: Get real execution user
+  ansible.builtin.command: whoami
+  register: current_os_user
+  changed_when: false
+  tags: [ssh_authorized]
+
+- name: Inject FIDO2 public keys into authorized_keys
+  ansible.posix.authorized_key:
+    user: "{{ current_os_user.stdout }}"
+    state: present
+    key: "{{ lookup('file', lookup('env', 'HOME') + '/dots/ssh_keys/' + item + '.pub') }}"
+    comment: "FIDO2 {{ item }}"
+  loop: "{{ ssh_key_pairs }}"
+  tags: [ssh_authorized]

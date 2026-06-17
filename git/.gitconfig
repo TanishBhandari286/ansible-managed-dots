@@ -1,0 +1,12 @@
+# This is Git's per-user configuration file.
+[user]
+# Please adapt and uncomment the following lines:
+	name = tanishbhandari286
+	email = tanishbhandari91@gmail.com
+	signingkey = /Users/devops/.ssh/id_ed25519_sk_key1.pub
+[pull]
+	rebase = true
+[gpg]
+	format = ssh
+[commit]
+	gpgsign = true
