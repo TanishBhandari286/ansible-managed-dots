@@ -3,6 +3,7 @@ Host *
     IdentitiesOnly yes
     ServerAliveInterval 60
     ServerAliveCountMax 3
+    SetEnv TERM=xterm-256color
 
 # --- Cloud Infrastructure ---
 Host vps
