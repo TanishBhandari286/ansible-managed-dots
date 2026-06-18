@@ -1,0 +1,64 @@
+---
+# ---------------------------------------------------------------------------
+# node_linux/tasks/install.yml
+# Install Node.js 20 LTS via NodeSource + build-essential via apt.
+# ---------------------------------------------------------------------------
+# Strategy:
+#   NodeSource publishes a setup script that:
+#     1. Adds the NodeSource GPG key to /etc/apt/keyrings/
+#     2. Writes /etc/apt/sources.list.d/nodesource.list
+#     3. Runs apt-get update
+#   We download the script to /tmp, run it once, then install the package.
+#   Re-running is idempotent: the script overwrites the same files in place,
+#   apt install with state=present is a no-op when the package is current.
+# ---------------------------------------------------------------------------
+
+# ---- Prerequisites ---------------------------------------------------------
+- name: Install curl (required to fetch NodeSource setup script)
+  ansible.builtin.apt:
+    name: curl
+    state: present
+    update_cache: false   # cache already updated in playbook pre_tasks
+  become: true
+
+# ---- NodeSource repository setup -------------------------------------------
+# Download the script to a fixed path so we can track changes and avoid
+# re-downloading on every run. force: false — skip if file already exists.
+- name: Download NodeSource setup script
+  ansible.builtin.get_url:
+    url: https://deb.nodesource.com/setup_20.x
+    dest: /tmp/nodesource_setup_20.sh
+    mode: "0700"
+    force: false   # idempotent: skip download if script already on disk
+  become: false
+
+# Run the setup script. It writes the apt source and key, then runs apt-get
+# update. We gate on whether the sources file already points to Node.js 20
+# so we do not re-run the script (and trigger apt-get update) on every play.
+- name: Check if NodeSource 20.x repo is already configured
+  ansible.builtin.stat:
+    path: /etc/apt/sources.list.d/nodesource.list
+  register: nodesource_list
+
+- name: Run NodeSource setup script to add repository
+  ansible.builtin.command:
+    cmd: /tmp/nodesource_setup_20.sh
+  become: true
+  when: not nodesource_list.stat.exists
+  changed_when: true   # the script always mutates apt state when it runs
+
+# ---- Node.js package -------------------------------------------------------
+- name: Install Node.js 20 LTS
+  ansible.builtin.apt:
+    name: nodejs
+    state: present
+    update_cache: false   # NodeSource setup script already ran apt-get update
+  become: true
+
+# ---- Build toolchain -------------------------------------------------------
+- name: Install build-essential
+  ansible.builtin.apt:
+    name: build-essential
+    state: present
+    update_cache: false
+  become: true

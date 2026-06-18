@@ -7,9 +7,10 @@
 # What this playbook does:
 #   1. Installs apt packages (git, zsh, neovim, curl, ripgrep, fzf, tmux…)
 #   2. Installs Zsh and sets it as the default shell
-#   3. Clones ~/dots repo (idempotent) and runs install.sh to create symlinks
+#   3. Installs Node.js 20 LTS + build-essential via NodeSource
 #   4. Installs Docker Engine via official apt repository
-#   5. Injects FIDO2 public keys into authorized_keys (owner only — skip with --skip-tags ssh)
+#   5. Clones ~/dots repo (idempotent) and runs install.sh to create symlinks
+#   6. Injects FIDO2 public keys into authorized_keys (owner only — skip with --skip-tags ssh)
 # ---------------------------------------------------------------------------
 
 - name: Provision Linux servers / VPS
@@ -39,6 +40,7 @@
     # System bootstrap — needs root
     - { role: packages_linux,  become: true,  tags: [packages, apt] }
     - { role: shell,           become: true,  tags: [shell, zsh] }
+    - { role: node_linux,      become: true,  tags: [node, nodejs, devtools] }
     - { role: docker_linux,    become: true,  tags: [docker, containers] }
 
     # Dotfiles — runs as login user, no root needed

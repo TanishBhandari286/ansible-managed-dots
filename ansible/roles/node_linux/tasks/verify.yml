@@ -1,0 +1,32 @@
+---
+# ---------------------------------------------------------------------------
+# node_linux/tasks/verify.yml
+# Confirm Node.js 20 and npm are available and print their versions.
+# All tasks use changed_when: false — verification never mutates state.
+# ---------------------------------------------------------------------------
+
+- name: Get node version
+  ansible.builtin.command: node --version
+  register: node_version
+  changed_when: false
+  become: false
+
+- name: Get npm version
+  ansible.builtin.command: npm --version
+  register: npm_version
+  changed_when: false
+  become: false
+
+- name: Verify node is 20.x
+  ansible.builtin.assert:
+    that: node_version.stdout is match('^v20\.')
+    fail_msg: >
+      Expected Node.js 20.x but got {{ node_version.stdout }}.
+      Check that the NodeSource 20.x repo was added correctly.
+    success_msg: "Node.js {{ node_version.stdout }} — OK"
+
+- name: Print Node.js and npm versions
+  ansible.builtin.debug:
+    msg:
+      - "node : {{ node_version.stdout }}"
+      - "npm  : v{{ npm_version.stdout }}"
