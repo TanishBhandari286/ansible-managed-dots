@@ -4,6 +4,7 @@
 # ---------------------------------------------------------------------------
 # All src: paths use lookup('env', 'HOME') to resolve the Mac control node's
 # local filesystem. copy: module always reads src from the control node.
+# All tasks run as the SSH login user (become: false) — no root access needed.
 # ---------------------------------------------------------------------------
 
 # ---- Ensure remote directory tree exists -----------------------------------
@@ -12,18 +13,21 @@
     path: "{{ dotfiles_dir }}/.config"
     state: directory
     mode: "0755"
+  become: false
 
 - name: Ensure remote dotfiles_dir/git exists
   ansible.builtin.file:
     path: "{{ dotfiles_dir }}/git"
     state: directory
     mode: "0755"
+  become: false
 
 - name: Ensure ~/.config directory exists
   ansible.builtin.file:
     path: "{{ user_home }}/.config"
     state: directory
     mode: "0755"
+  become: false
 
 # ---- Push config files from Mac control node to remote ---------------------
 # Note: copy with a directory src copies the directory *and its name* into dest.
@@ -33,6 +37,7 @@
     src: "{{ lookup('env', 'HOME') }}/dots/.config/nvim"
     dest: "{{ dotfiles_dir }}/.config/"
     mode: preserve
+  become: false
   tags: [nvim]
 
 - name: Push .gitconfig to remote dotfiles_dir/git/
@@ -40,6 +45,7 @@
     src: "{{ lookup('env', 'HOME') }}/dots/git/.gitconfig"
     dest: "{{ dotfiles_dir }}/git/.gitconfig"
     mode: "0644"
+  become: false
   tags: [git]
 
 # ---- Neovim config symlink --------------------------------------------------
@@ -49,6 +55,7 @@
     dest: "{{ user_home }}/.config/nvim"
     state: link
     force: true
+  become: false
   tags: [nvim]
 
 # ---- Home-directory symlinks ------------------------------------------------
@@ -58,4 +65,5 @@
     dest: "{{ user_home }}/.gitconfig"
     state: link
     force: true
+  become: false
   tags: [git]

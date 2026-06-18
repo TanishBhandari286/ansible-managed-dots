@@ -2,10 +2,9 @@
 # ---------------------------------------------------------------------------
 # Role: dotfiles_mac — Symlink macOS-specific config files
 # ---------------------------------------------------------------------------
-# Symlinking strategy: for each target that may already exist as a real
-# directory (populated by apps on first launch), we first remove it, then
-# create the symlink. ansible.builtin.file state=link with force: true handles
-# missing targets and broken symlinks, but refuses non-empty directories.
+# Symlinking strategy: ansible.builtin.file with state=link and force=true
+# is fully idempotent — it creates the symlink when absent and is a no-op
+# when the correct symlink already exists. No pre-deletion step is needed.
 # ---------------------------------------------------------------------------
 
 # ---- Ensure ~/.config exists -----------------------------------------------
@@ -16,12 +15,6 @@
     mode: "0755"
 
 # ---- AeroSpace -------------------------------------------------------------
-- name: Remove existing ~/.config/aerospace directory if present
-  ansible.builtin.file:
-    path: "{{ user_home }}/.config/aerospace"
-    state: absent
-  tags: [aerospace]
-
 - name: Symlink ~/.config/aerospace
   ansible.builtin.file:
     src: "{{ dotfiles_dir }}/.config/aerospace"
@@ -31,12 +24,6 @@
   tags: [aerospace]
 
 # ---- Ghostty ---------------------------------------------------------------
-- name: Remove existing ~/.config/ghostty directory if present
-  ansible.builtin.file:
-    path: "{{ user_home }}/.config/ghostty"
-    state: absent
-  tags: [ghostty]
-
 - name: Symlink ~/.config/ghostty
   ansible.builtin.file:
     src: "{{ dotfiles_dir }}/.config/ghostty"
@@ -46,12 +33,6 @@
   tags: [ghostty]
 
 # ---- Neovim ----------------------------------------------------------------
-- name: Remove existing ~/.config/nvim directory if present
-  ansible.builtin.file:
-    path: "{{ user_home }}/.config/nvim"
-    state: absent
-  tags: [nvim]
-
 - name: Symlink ~/.config/nvim
   ansible.builtin.file:
     src: "{{ dotfiles_dir }}/.config/nvim"

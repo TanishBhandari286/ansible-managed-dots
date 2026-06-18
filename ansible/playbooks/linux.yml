@@ -2,7 +2,7 @@
 # ---------------------------------------------------------------------------
 # Linux Provisioning Playbook
 # ---------------------------------------------------------------------------
-# Run: cd ~/dots/ansible && ansible-playbook playbooks/linux.yml -K
+# Run: cd ~/dots/ansible && ansible-playbook playbooks/linux.yml
 # ---------------------------------------------------------------------------
 
 - name: Provision Linux servers / VPS
@@ -22,21 +22,16 @@
       when: ansible_facts['os_family'] == "Debian"
       become: true
 
-    # Resolve the real OS username at runtime. ansible_user is the inventory
-    # alias (e.g. "server-node") which may not match /etc/passwd. Cached facts
-    # hold "root" from the become: true phase above. whoami with become: false
-    # returns the exact string the OS has for the SSH-connected user.
-    - name: Capture real executing username via whoami
-      ansible.builtin.command: whoami
-      register: _real_user
-      changed_when: false
-      become: false
-
-    - name: Override user_home and dotfiles_dir with real OS username
+    # Compute user_home and dotfiles_dir once here; all roles consume them.
+    # ansible_user is the inventory SSH login user (vps / master-node / server-node).
+    # With become=False globally, gather_facts runs as ansible_user, so
+    # ansible_facts['user_id'] == ansible_user — but we prefer ansible_user
+    # because it is set explicitly in the inventory and does not depend on
+    # how facts are gathered.
+    - name: Set user_home and dotfiles_dir
       ansible.builtin.set_fact:
-        user_home: "/home/{{ _real_user.stdout }}"
-        dotfiles_dir: "/home/{{ _real_user.stdout }}/dots"
-      become: false
+        user_home: "/home/{{ ansible_user }}"
+        dotfiles_dir: "/home/{{ ansible_user }}/dots"
 
   roles:
     # needs root — apt install, chsh, /etc/shells

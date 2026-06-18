@@ -2,17 +2,15 @@
 # ---------------------------------------------------------------------------
 # Global variables — available to ALL hosts
 # ---------------------------------------------------------------------------
-
-# OS-aware home directory — single source of truth used by all roles.
-# Always resolves to a fully absolute path. NO tildes (~) are used anywhere —
-# tildes are expanded by the shell, not by Ansible's Python runtime, and cause
-# literal directories named "~username" to be created when become is active.
-# macOS: /Users/<user_id>   Linux: /home/<ansible_user || user_id>
-user_home: "{{ '/Users/' + ansible_facts['user_id'] if ansible_facts['os_family'] == 'Darwin' else '/home/' + (ansible_user | default(ansible_facts['user_id'])) }}"
-
-# Absolute path to the cloned dotfiles repo on each target host.
-# Derived from user_home so it automatically resolves correctly on macOS and Linux.
-dotfiles_dir: "{{ user_home }}/dots"
+# RULE: Only STATIC values live here. No ansible_facts, no Jinja2 expressions
+# that reference runtime state. group_vars is parsed before gather_facts runs,
+# so any dynamic expression here will fail or produce wrong values.
+#
+# user_home    — set in each playbook's pre_tasks via set_fact
+# dotfiles_dir — derived from user_home in each playbook's pre_tasks
+#   Linux:  user_home = /home/{{ ansible_user }}
+#   macOS:  user_home = /Users/{{ ansible_facts['user_id'] }}
+# ---------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------
 # SSH Key Configuration

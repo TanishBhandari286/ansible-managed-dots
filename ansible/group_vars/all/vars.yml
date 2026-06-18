@@ -2,11 +2,13 @@
 # ---------------------------------------------------------------------------
 # Global variables — available to ALL hosts
 # ---------------------------------------------------------------------------
-
-# Absolute path to the root of this cloned dotfiles repository.
-# Uses ansible_facts['env']['HOME'] so this resolves to the correct HOME
-# on each target host (remote Linux or local macOS) rather than the control node.
-dotfiles_dir: "{{ ansible_facts['env']['HOME'] }}/dots"
+# RULE: Only STATIC values live here. No ansible_facts, no Jinja2 expressions
+# that reference runtime state. group_vars is parsed before gather_facts runs,
+# so any dynamic expression here will fail or produce wrong values.
+#
+# user_home    — set in each playbook's pre_tasks via set_fact
+# dotfiles_dir — derived from user_home in each playbook's pre_tasks
+# ---------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------
 # SSH Key Configuration

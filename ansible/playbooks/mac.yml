@@ -18,6 +18,15 @@
         that: ansible_facts['os_family'] == "Darwin"
         fail_msg: "This playbook is for macOS only. Use linux.yml for Linux hosts."
 
+    # Compute user_home and dotfiles_dir once here; all roles consume them.
+    # ansible_facts['user_id'] is safe on macOS: gather_facts runs as the
+    # login user (become: false at play level), so user_id is never 'root'.
+    # The dotfiles repo is always cloned directly into the user's home directory.
+    - name: Set user_home and dotfiles_dir
+      ansible.builtin.set_fact:
+        user_home: "/Users/{{ ansible_facts['user_id'] }}"
+        dotfiles_dir: "/Users/{{ ansible_facts['user_id'] }}/dots"
+
   roles:
     - role: homebrew
       tags: [homebrew, brew]
