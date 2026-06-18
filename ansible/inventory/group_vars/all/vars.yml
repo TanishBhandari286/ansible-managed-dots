@@ -18,7 +18,7 @@
 # ---------------------------------------------------------------------------
 
 # URL used by the dotfiles role to clone ~/dots on each target machine.
-dotfiles_repo_url: https://github.com/TanishBhandari286/dots.git
+dotfiles_repo_url: https://github.com/TanishBhandari286/ansible-managed-dots.git
 
 # ---------------------------------------------------------------------------
 # SSH Key Configuration

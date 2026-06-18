@@ -20,16 +20,22 @@
     mode: "0755"
   become: false
 
-# Clone the repo only if it isn't already there.
-# update: false — Ansible does not pull; the user runs `git pull` manually.
-# This prevents Ansible from overwriting uncommitted local changes.
+# Clone or pull the dotfiles repo.
+# update: true  — Ansible runs `git pull` on subsequent runs so servers stay
+#                  in sync with the remote without manual intervention.
+# accept_hostkey — automatically accept the GitHub host key on first connect.
+# GIT_TERMINAL_PROMPT=0 — abort immediately if git would prompt for credentials
+#                  instead of hanging the playbook on a non-interactive shell.
 - name: Clone dotfiles repository
   ansible.builtin.git:
     repo: "{{ dotfiles_repo_url }}"
     dest: "{{ dotfiles_dir }}"
     version: main
     clone: true
-    update: false
+    update: true
+    accept_hostkey: true
+  environment:
+    GIT_TERMINAL_PROMPT: "0"
   become: false
 
 # Run install.sh on the target machine.
