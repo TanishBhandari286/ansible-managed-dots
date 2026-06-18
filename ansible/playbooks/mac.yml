@@ -12,7 +12,8 @@
 # ---------------------------------------------------------------------------
 
 - name: Provision macOS workstation
-  hosts: mac
+  hosts: localhost
+  connection: local
   gather_facts: true
   become: false   # macOS provisioning runs as the standard user throughout.
                   # Homebrew, dotfiles, and SSH keys must NOT run as root.
