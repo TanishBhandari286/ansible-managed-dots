@@ -23,6 +23,24 @@
     backup: true
   tags: [ssh_config]
 
+# ---- GitHub known_hosts ----------------------------------------------------
+# Ensures git@github.com connections succeed non-interactively on first run.
+# ssh-keyscan fetches the current live key; known_hosts module is idempotent.
+- name: Fetch GitHub host key via ssh-keyscan
+  ansible.builtin.command:
+    cmd: ssh-keyscan -t ed25519 github.com
+  register: github_hostkey
+  changed_when: false
+  tags: [ssh_config]
+
+- name: Add GitHub host key to ~/.ssh/known_hosts
+  ansible.builtin.known_hosts:
+    name: github.com
+    key: "{{ github_hostkey.stdout }}"
+    path: "{{ user_home }}/.ssh/known_hosts"
+    state: present
+  tags: [ssh_config]
+
 # ---- M2M automation key (vault-encrypted private key) -----------------------
 - name: Deploy automation private key (id_ed25519_ansible)
   ansible.builtin.copy:

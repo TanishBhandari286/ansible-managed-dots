@@ -2,26 +2,46 @@
 # ---------------------------------------------------------------------------
 # ssh_linux/tasks/ssh_config.yml
 # ---------------------------------------------------------------------------
-# Ensure ~/.ssh/config exists and contains a GitHub stanza that tells Git
-# (and SSH) to use the automation key for all github.com connections.
+# 1. Ensure GitHub's host key is in ~/.ssh/known_hosts — required for any
+#    non-interactive SSH connection to github.com (git clone, git pull).
+#    We use ssh-keyscan rather than a hardcoded key so the fingerprint stays
+#    current if GitHub ever rotates its host key.
+#
+# 2. Ensure ~/.ssh/config contains a GitHub stanza pointing to the automation
+#    key — so Git picks up the right key without needing ssh-agent.
 #
 # Why blockinfile and not copy/template?
-#   The user may already have a ~/.ssh/config on the server with other hosts.
-#   blockinfile inserts only the marked block and is a clean no-op on re-runs.
-#   It never overwrites unrelated config the user has written manually.
+#   Servers may already have a ~/.ssh/config with other hosts. blockinfile
+#   inserts only the marked block; never touches anything else. Idempotent.
 #
-# IdentitiesOnly yes  — prevents SSH from trying every key in the agent first,
-#                       which causes "Too many authentication failures" on
-#                       servers that have a low MaxAuthTries limit.
+# IdentitiesOnly yes  — prevents "Too many authentication failures" on hosts
+#                       with low MaxAuthTries when the agent has many keys.
 # ---------------------------------------------------------------------------
 
+# ---- GitHub known_hosts ----------------------------------------------------
+- name: Fetch GitHub host key via ssh-keyscan
+  ansible.builtin.command:
+    cmd: ssh-keyscan -t ed25519 github.com
+  register: github_hostkey
+  changed_when: false   # read-only network operation
+  become: false
+
+- name: Add GitHub host key to ~/.ssh/known_hosts
+  ansible.builtin.known_hosts:
+    name: github.com
+    key: "{{ github_hostkey.stdout }}"
+    path: "{{ user_home }}/.ssh/known_hosts"
+    state: present
+  become: false
+
+# ---- SSH client config -----------------------------------------------------
 - name: Ensure ~/.ssh/config exists
   ansible.builtin.file:
     path: "{{ user_home }}/.ssh/config"
     state: touch
     mode: "0600"
     owner: "{{ ansible_user }}"
-    modification_time: preserve   # touch without updating mtime if file exists
+    modification_time: preserve
     access_time: preserve
   become: false
 
@@ -36,5 +56,5 @@
         IdentityFile ~/.ssh/id_ed25519_ansible
         IdentitiesOnly yes
     mode: "0600"
-    create: false   # file already ensured above
+    create: false
   become: false

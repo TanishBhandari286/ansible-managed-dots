@@ -15,7 +15,10 @@
 # Dotfiles Repository
 # ---------------------------------------------------------------------------
 
-dotfiles_repo_url: https://github.com/TanishBhandari286/ansible-managed-dots.git
+# SSH URL — used for both initial clone and git remote set-url.
+# Requires id_ed25519_ansible to be deployed and ~/.ssh/config to have
+# a github.com stanza before the dotfiles role runs.
+dotfiles_repo_url: git@github.com:TanishBhandari286/ansible-managed-dots.git
 
 # ansible_facts['env']['HOME'] is the login user's home directory, sourced
 # from the shell environment gathered by gather_facts. Consistent across

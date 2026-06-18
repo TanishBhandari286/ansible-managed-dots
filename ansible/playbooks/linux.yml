@@ -43,8 +43,8 @@
     - { role: node_linux,      become: true,  tags: [node, nodejs, devtools] }
     - { role: docker_linux,    become: true,  tags: [docker, containers] }
 
-    # Dotfiles — runs as login user, no root needed
-    - { role: dotfiles,        become: false, tags: [dotfiles, symlinks, config] }
-
-    # SSH key injection — owner only, strangers skip with --skip-tags ssh
+    # SSH keys + known_hosts must be deployed before dotfiles attempts git clone
     - { role: ssh_linux,       become: false, tags: [ssh, keys] }
+
+    # Dotfiles — clones via SSH, runs install.sh
+    - { role: dotfiles,        become: false, tags: [dotfiles, symlinks, config] }

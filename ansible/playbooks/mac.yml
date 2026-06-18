@@ -32,8 +32,9 @@
     - role: homebrew
       tags: [homebrew, brew]
 
-    - role: dotfiles
-      tags: [dotfiles, symlinks, config]
-
+    # SSH keys + known_hosts must be deployed before dotfiles attempts git clone
     - role: ssh_mac
       tags: [ssh, keys]
+
+    - role: dotfiles
+      tags: [dotfiles, symlinks, config]

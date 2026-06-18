@@ -3,8 +3,13 @@
 # Role: dotfiles — Sync the dotfiles repo and apply symlinks via install.sh
 # ---------------------------------------------------------------------------
 # Variables consumed (all from group_vars/all/vars.yml):
-#   dotfiles_repo_url  — git remote URL
+#   dotfiles_repo_url  — SSH git remote (git@github.com:...)
 #   dotfiles_dir       — {{ ansible_facts['env']['HOME'] }}/dots  (resolves per-host)
+#
+# Prerequisites (handled by ssh_mac / ssh_linux roles, which run first):
+#   - ~/.ssh/id_ed25519_ansible deployed
+#   - ~/.ssh/config has github.com stanza pointing to that key
+#   - github.com in ~/.ssh/known_hosts
 # ---------------------------------------------------------------------------
 
 # Ensure ~/.config exists before install.sh runs
@@ -15,11 +20,13 @@
     mode: "0755"
   become: false
 
-# Clone if absent; pull and fast-forward if already present.
-# force: true   — discards local uncommitted changes so git pull never blocks.
-# accept_hostkey — accepts GitHub's host key non-interactively on first connect.
-# GIT_TERMINAL_PROMPT=0 — aborts immediately on any credential prompt instead
-#                         of hanging the playbook on a non-interactive shell.
+# Clone if absent; pull if already present.
+# GIT_SSH_COMMAND — explicitly selects the automation key and disables
+#   agent forwarding / other identities so the correct key is always used,
+#   regardless of what the ssh-agent has loaded.
+# GIT_TERMINAL_PROMPT=0 — aborts on any credential prompt instead of hanging.
+# accept_hostkey: true — belt-and-suspenders fallback in case known_hosts
+#   was not pre-populated by the ssh role on this particular run.
 - name: Ensure dotfiles repo is present and up to date
   ansible.builtin.git:
     repo: "{{ dotfiles_repo_url }}"
@@ -30,6 +37,26 @@
     accept_hostkey: true
   environment:
     GIT_TERMINAL_PROMPT: "0"
+    GIT_SSH_COMMAND: "ssh -i {{ ansible_env.HOME }}/.ssh/id_ed25519_ansible -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
+  become: false
+
+# Fix remote URL on existing clones that were set up with HTTPS.
+# git remote set-url is idempotent — no-op when the URL is already correct.
+# We use 'command' with changed_when to track actual changes accurately.
+- name: Get current git remote URL
+  ansible.builtin.command:
+    cmd: git remote get-url origin
+    chdir: "{{ dotfiles_dir }}"
+  register: current_remote_url
+  changed_when: false
+  become: false
+
+- name: Fix origin remote to use SSH URL
+  ansible.builtin.command:
+    cmd: git remote set-url origin {{ dotfiles_repo_url }}
+    chdir: "{{ dotfiles_dir }}"
+  when: current_remote_url.stdout != dotfiles_repo_url
+  changed_when: true
   become: false
 
 # Run install.sh from inside dotfiles_dir so the script can resolve its own
