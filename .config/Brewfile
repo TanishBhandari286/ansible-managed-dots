@@ -72,6 +72,8 @@ cask "brave-browser"
 # Time tracking tool for agencies and freelancers
 cask "clockify"
 # Web browser
+cask "macshot"
+cask "gcloud-cli"
 cask "firefox"
 cask "font-jetbrains-mono"
 # Terminal emulator that uses platform-native UI and GPU acceleration
