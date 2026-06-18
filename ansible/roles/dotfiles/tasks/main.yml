@@ -21,11 +21,12 @@
   become: false
 
 # Clone or pull the dotfiles repo.
-# update: true  — Ansible runs `git pull` on subsequent runs so servers stay
-#                  in sync with the remote without manual intervention.
-# accept_hostkey — automatically accept the GitHub host key on first connect.
-# GIT_TERMINAL_PROMPT=0 — abort immediately if git would prompt for credentials
-#                  instead of hanging the playbook on a non-interactive shell.
+# update: true      — pull on every run so servers stay in sync automatically.
+# force: true       — discard any local uncommitted changes before pulling,
+#                     preventing merge conflicts from stopping the playbook.
+# accept_hostkey    — accept GitHub host key on first connect non-interactively.
+# GIT_TERMINAL_PROMPT=0 — abort immediately on credential prompts instead of
+#                     hanging the playbook on a non-interactive shell.
 - name: Clone dotfiles repository
   ansible.builtin.git:
     repo: "{{ dotfiles_repo_url }}"
@@ -33,6 +34,7 @@
     version: main
     clone: true
     update: true
+    force: true
     accept_hostkey: true
   environment:
     GIT_TERMINAL_PROMPT: "0"
