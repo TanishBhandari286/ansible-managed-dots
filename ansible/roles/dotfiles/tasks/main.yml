@@ -4,13 +4,13 @@
 # ---------------------------------------------------------------------------
 # Variables consumed (all from group_vars/all/vars.yml):
 #   dotfiles_repo_url  — git remote URL
-#   dotfiles_dir       — {{ ansible_env.HOME }}/dots  (resolves per-host)
+#   dotfiles_dir       — {{ ansible_facts['env']['HOME'] }}/dots  (resolves per-host)
 # ---------------------------------------------------------------------------
 
 # Ensure ~/.config exists before install.sh runs
 - name: Ensure ~/.config directory exists
   ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.config"
+    path: "{{ ansible_facts['user']['dir'] | default(ansible_facts['env']['HOME']) }}/.config"
     state: directory
     mode: "0755"
   become: false

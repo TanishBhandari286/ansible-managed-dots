@@ -16,10 +16,10 @@
 
 dotfiles_repo_url: https://github.com/TanishBhandari286/ansible-managed-dots.git
 
-# ansible_env.HOME resolves to the login user's home on each target host.
-# This works correctly for every user (vps, master-node, server-node, devops)
-# without hardcoding /home/ or /Users/ prefixes in playbooks or roles.
-dotfiles_dir: "{{ ansible_env.HOME }}/dots"
+# ansible_facts['env']['HOME'] is the login user's home directory, sourced
+# from the shell environment gathered by gather_facts. Consistent across
+# macOS and Linux without hardcoding /home/ or /Users/ paths.
+dotfiles_dir: "{{ ansible_facts['user']['dir'] | default(ansible_facts['env']['HOME']) }}/dots"
 
 # ---------------------------------------------------------------------------
 # SSH Key Configuration
