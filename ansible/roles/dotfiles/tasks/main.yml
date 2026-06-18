@@ -1,34 +1,26 @@
 ---
 # ---------------------------------------------------------------------------
-# Role: dotfiles — Clone the dotfiles repo and run install.sh
+# Role: dotfiles — Sync the dotfiles repo and apply symlinks via install.sh
 # ---------------------------------------------------------------------------
-# This role has ONE job: ensure the dots repo exists on the target machine
-# and the symlinks are in place. It never copies file content — git owns
-# the content, install.sh owns the symlinks.
-#
-# Variables consumed:
-#   dotfiles_repo_url   — git remote (from group_vars/all/vars.yml)
-#   dotfiles_dir        — clone destination (set in playbook pre_tasks)
-#   user_home           — target user's home directory
+# Variables consumed (all from group_vars/all/vars.yml):
+#   dotfiles_repo_url  — git remote URL
+#   dotfiles_dir       — {{ ansible_env.HOME }}/dots  (resolves per-host)
 # ---------------------------------------------------------------------------
 
 # Ensure ~/.config exists before install.sh runs
 - name: Ensure ~/.config directory exists
   ansible.builtin.file:
-    path: "{{ user_home }}/.config"
+    path: "{{ ansible_env.HOME }}/.config"
     state: directory
     mode: "0755"
   become: false
 
-# Remove any existing directory first — ensures a clean, valid git repo on every run.
-# Avoids "destination is not empty" or corrupt-state failures from previous runs.
-- name: Remove existing dotfiles directory
-  ansible.builtin.file:
-    path: "{{ dotfiles_dir }}"
-    state: absent
-  become: false
-
-- name: Clone dotfiles repository
+# Clone if absent; pull and fast-forward if already present.
+# force: true   — discards local uncommitted changes so git pull never blocks.
+# accept_hostkey — accepts GitHub's host key non-interactively on first connect.
+# GIT_TERMINAL_PROMPT=0 — aborts immediately on any credential prompt instead
+#                         of hanging the playbook on a non-interactive shell.
+- name: Ensure dotfiles repo is present and up to date
   ansible.builtin.git:
     repo: "{{ dotfiles_repo_url }}"
     dest: "{{ dotfiles_dir }}"
@@ -40,15 +32,15 @@
     GIT_TERMINAL_PROMPT: "0"
   become: false
 
-# Run install.sh on the target machine.
-# The script is OS-aware: creates shared symlinks on all platforms,
-# mac-only symlinks (aerospace, ghostty, starship, gitconfig.mac) on Darwin.
-- name: Run install.sh to create dotfile symlinks
+# Run install.sh from inside dotfiles_dir so the script can resolve its own
+# path correctly via dirname. chdir is safer than passing an absolute cmd path.
+- name: Run install.sh to apply symlinks
   ansible.builtin.command:
-    cmd: "{{ dotfiles_dir }}/install.sh"
+    cmd: ./install.sh
+    chdir: "{{ dotfiles_dir }}"
   become: false
   register: install_out
-  changed_when: "'✓' in install_out.stdout"   # only changed when a new symlink was created
+  changed_when: "'✓' in install_out.stdout"
 
 - name: Show install.sh output
   ansible.builtin.debug:

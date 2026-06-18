@@ -14,8 +14,12 @@
 # Dotfiles Repository
 # ---------------------------------------------------------------------------
 
-# URL used by the dotfiles role to clone ~/dots on each target machine.
 dotfiles_repo_url: https://github.com/TanishBhandari286/ansible-managed-dots.git
+
+# ansible_env.HOME resolves to the login user's home on each target host.
+# This works correctly for every user (vps, master-node, server-node, devops)
+# without hardcoding /home/ or /Users/ prefixes in playbooks or roles.
+dotfiles_dir: "{{ ansible_env.HOME }}/dots"
 
 # ---------------------------------------------------------------------------
 # SSH Key Configuration

@@ -31,10 +31,9 @@
 
     # ansible_user is the inventory SSH login user (vps / master-node / server-node).
     # With become=False globally, gather_facts runs as ansible_user.
-    - name: Set user_home and dotfiles_dir
+    - name: Set user_home
       ansible.builtin.set_fact:
         user_home: "/home/{{ ansible_user }}"
-        dotfiles_dir: "/home/{{ ansible_user }}/dots"
 
   roles:
     # System bootstrap — needs root
