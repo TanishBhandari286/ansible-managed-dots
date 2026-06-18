@@ -22,30 +22,20 @@
   become: true
 
 # ---- NodeSource repository setup -------------------------------------------
-# Download the script to a fixed path so we can track changes and avoid
-# re-downloading on every run. force: false — skip if file already exists.
-- name: Download NodeSource setup script
-  ansible.builtin.get_url:
-    url: https://deb.nodesource.com/setup_20.x
-    dest: /tmp/nodesource_setup_20.sh
-    mode: "0700"
-    force: false   # idempotent: skip download if script already on disk
-  become: false
-
-# Run the setup script. It writes the apt source and key, then runs apt-get
-# update. We gate on whether the sources file already points to Node.js 20
-# so we do not re-run the script (and trigger apt-get update) on every play.
+# Use the canonical NodeSource one-liner. The stat guard ensures this only
+# runs once — on subsequent plays nodesource.list already exists so the
+# shell task is skipped entirely (ok, not changed).
 - name: Check if NodeSource 20.x repo is already configured
   ansible.builtin.stat:
     path: /etc/apt/sources.list.d/nodesource.list
   register: nodesource_list
 
 - name: Run NodeSource setup script to add repository
-  ansible.builtin.command:
-    cmd: /tmp/nodesource_setup_20.sh
+  ansible.builtin.shell:
+    cmd: curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
   become: true
   when: not nodesource_list.stat.exists
-  changed_when: true   # the script always mutates apt state when it runs
+  changed_when: true   # always mutates apt state when it runs
 
 # ---- Node.js package -------------------------------------------------------
 - name: Install Node.js 20 LTS

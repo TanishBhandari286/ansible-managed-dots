@@ -37,7 +37,7 @@
     accept_hostkey: true
   environment:
     GIT_TERMINAL_PROMPT: "0"
-    GIT_SSH_COMMAND: "ssh -i {{ ansible_env.HOME }}/.ssh/id_ed25519_ansible -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
+    GIT_SSH_COMMAND: "ssh -i {{ ansible_facts['env']['HOME'] }}/.ssh/id_ed25519_ansible -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
   become: false
 
 # Fix remote URL on existing clones that were set up with HTTPS.
