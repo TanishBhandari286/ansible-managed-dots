@@ -1,0 +1,38 @@
+---
+# ---------------------------------------------------------------------------
+# ssh_linux/tasks/deploy_automation_key.yml
+# ---------------------------------------------------------------------------
+# Deploy the M2M automation SSH key pair to the remote Linux host's ~/.ssh/.
+# This gives the server its own SSH identity for outbound connections:
+#   - git clone via SSH (git@github.com) without HTTPS tokens
+#   - any future machine-to-machine automation
+#
+# Source: read from the Mac control node via lookup('env', 'HOME').
+#         The vault-encrypted private key is decrypted in memory by Ansible
+#         and written to the remote — it never touches disk unencrypted on
+#         the control node.
+#
+# SECURITY notes:
+#   - no_log: true on the private key task — keeps key content out of logs
+#   - Private key written with mode 0600 (owner read/write only)
+#   - Public key written with mode 0644
+# ---------------------------------------------------------------------------
+
+- name: Deploy automation private key (id_ed25519_ansible)
+  ansible.builtin.copy:
+    src: "{{ lookup('env', 'HOME') }}/dots/ssh_keys/{{ ssh_automation_key }}"
+    dest: "{{ user_home }}/.ssh/{{ ssh_automation_key }}"
+    mode: "0600"
+    owner: "{{ ansible_user }}"
+  become: false
+  no_log: true
+  tags: [ssh_automation, ssh_keys_private]
+
+- name: Deploy automation public key (id_ed25519_ansible.pub)
+  ansible.builtin.copy:
+    src: "{{ lookup('env', 'HOME') }}/dots/ssh_keys/{{ ssh_automation_key }}.pub"
+    dest: "{{ user_home }}/.ssh/{{ ssh_automation_key }}.pub"
+    mode: "0644"
+    owner: "{{ ansible_user }}"
+  become: false
+  tags: [ssh_automation, ssh_keys_public]

@@ -18,8 +18,6 @@ background-opacity = 1.0
 clipboard-read = allow
 clipboard-write = allow
 copy-on-select = true
-osc-52-copy = allow
-osc-52-paste = allow
 
 # Shell Integration (helps with SSH and prompt detection)
 shell-integration = zsh
@@ -30,5 +28,3 @@ mouse-hide-while-typing = false
 # Behavior
 cursor-style = block
 cursor-style-blink = false
-clipboard-read = unbuffered
-clipboard-write = unbuffered

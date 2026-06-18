@@ -1,0 +1,40 @@
+---
+# ---------------------------------------------------------------------------
+# ssh_linux/tasks/ssh_config.yml
+# ---------------------------------------------------------------------------
+# Ensure ~/.ssh/config exists and contains a GitHub stanza that tells Git
+# (and SSH) to use the automation key for all github.com connections.
+#
+# Why blockinfile and not copy/template?
+#   The user may already have a ~/.ssh/config on the server with other hosts.
+#   blockinfile inserts only the marked block and is a clean no-op on re-runs.
+#   It never overwrites unrelated config the user has written manually.
+#
+# IdentitiesOnly yes  — prevents SSH from trying every key in the agent first,
+#                       which causes "Too many authentication failures" on
+#                       servers that have a low MaxAuthTries limit.
+# ---------------------------------------------------------------------------
+
+- name: Ensure ~/.ssh/config exists
+  ansible.builtin.file:
+    path: "{{ user_home }}/.ssh/config"
+    state: touch
+    mode: "0600"
+    owner: "{{ ansible_user }}"
+    modification_time: preserve   # touch without updating mtime if file exists
+    access_time: preserve
+  become: false
+
+- name: Add GitHub SSH config block for automation key
+  ansible.builtin.blockinfile:
+    path: "{{ user_home }}/.ssh/config"
+    marker: "# {mark} ANSIBLE MANAGED — github.com automation key"
+    block: |
+      Host github.com
+        HostName github.com
+        User git
+        IdentityFile ~/.ssh/id_ed25519_ansible
+        IdentitiesOnly yes
+    mode: "0600"
+    create: false   # file already ensured above
+  become: false

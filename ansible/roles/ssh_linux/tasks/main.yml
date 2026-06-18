@@ -1,9 +1,13 @@
 ---
 # ---------------------------------------------------------------------------
-# Role: ssh_linux — Insert FIDO2 public keys into authorized_keys
+# Role: ssh_linux — SSH key deployment for Linux hosts
 # ---------------------------------------------------------------------------
-# SECURITY: Only PUBLIC keys are read. Private keys and the SSH config
-# file are NEVER copied to remote Linux hosts.
+# Two responsibilities:
+#   1. deploy_automation_key.yml — place the automation SSH key pair locally
+#      in ~/.ssh/ so the server can make outbound SSH connections (git clone,
+#      machine-to-machine). Uses vault-encrypted key from control node.
+#   2. authorized_keys injection — insert FIDO2 public keys so the owner can
+#      log in interactively with their YubiKey.
 # ---------------------------------------------------------------------------
 
 - name: Ensure ~/.ssh directory exists on remote host
@@ -13,13 +17,18 @@
     mode: "0700"
   become: false
 
+# ---- Machine SSH identity (for outbound SSH / git clone via SSH) ------------
+- name: Deploy automation SSH key pair
+  ansible.builtin.import_tasks: deploy_automation_key.yml
+
+# ---- SSH client config (GitHub → automation key) ---------------------------
+- name: Configure SSH client for github.com
+  ansible.builtin.import_tasks: ssh_config.yml
+
+# ---- Authorized keys (for interactive login from Mac) ----------------------
 # lookup('file') always runs on the control node (Mac). We build the path
 # from lookup('env', 'HOME') — the Mac's local $HOME — not dotfiles_dir,
 # which points to the remote user's home and is unreachable from localhost.
-#
-# user: resolution strategy: we run whoami on the remote host at execution time
-# to get the real /etc/passwd username. This bypasses ansible_user which is
-# the inventory alias and may not match the /etc/passwd entry.
 - name: Get real execution user
   ansible.builtin.command: whoami
   register: current_os_user
