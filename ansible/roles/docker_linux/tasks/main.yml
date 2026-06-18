@@ -1,0 +1,27 @@
+---
+# ---------------------------------------------------------------------------
+# Role: docker_linux — Install Docker Engine via official apt repository
+# ---------------------------------------------------------------------------
+# Skips entirely on non-Debian systems. All sub-task files use the same guard
+# so the role is safe to include in a play that targets mixed OS families.
+# ---------------------------------------------------------------------------
+
+- name: Install Docker Engine
+  ansible.builtin.import_tasks: install.yml
+  when: ansible_facts['os_family'] == "Debian"
+  tags: [docker, containers]
+
+- name: Configure Docker service
+  ansible.builtin.import_tasks: service.yml
+  when: ansible_facts['os_family'] == "Debian"
+  tags: [docker, containers]
+
+- name: Add login user to docker group
+  ansible.builtin.import_tasks: user.yml
+  when: ansible_facts['os_family'] == "Debian"
+  tags: [docker, containers]
+
+- name: Validate Docker installation
+  ansible.builtin.import_tasks: validate.yml
+  when: ansible_facts['os_family'] == "Debian"
+  tags: [docker, containers]

@@ -41,3 +41,6 @@
     - { role: shell,           become: false, tags: [shell, zsh] }
     - { role: dotfiles_linux,  become: false, tags: [dotfiles, symlinks, config] }
     - { role: ssh_linux,       become: false, tags: [ssh, keys] }
+
+    # Docker Engine via official apt repository; skips on non-Debian
+    - { role: docker_linux,    become: true,  tags: [docker, containers] }
