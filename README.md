@@ -2,6 +2,8 @@
 
 A fully automated, Ansible-powered dotfiles repository for macOS workstations and Linux servers. Clone once, provision anywhere.
 
+> **Friend or colleague?** See [STRANGER.md](STRANGER.md) for a single-command setup guide that skips the private key and vault stuff.
+
 ---
 
 ## Repository Structure
@@ -12,6 +14,9 @@ dots/
 ├── .gitignore                  # Blocks private keys and vault password from git
 ├── .zshrc                      # Minimal Zsh configuration (symlinked to ~/.zshrc)
 ├── starship.toml               # Starship prompt config (symlinked to ~/.config/starship.toml)
+├── README.md                   # Owner setup guide (this file)
+├── STRANGER.md                 # One-command setup guide for friends / colleagues
+├── steps.md                    # Chronological change log and command reference
 │
 ├── .config/
 │   ├── Brewfile                # Homebrew packages + casks (macOS only)
@@ -42,7 +47,7 @@ dots/
     │
     ├── group_vars/
     │   └── all/
-    │       ├── vars.yml        # Shared variables (dotfiles_dir, ssh_key_pairs)
+    │       ├── vars.yml        # Shared static variables (ssh_key_pairs)
     │       └── vault.yml       # Ansible-vault encrypted secrets
     │
     ├── playbooks/
@@ -55,6 +60,7 @@ dots/
         ├── dotfiles_mac/       # macOS-specific config symlinks
         ├── dotfiles_linux/     # Linux-specific config symlinks
         ├── packages_linux/     # apt package installation
+        ├── docker_linux/       # Docker Engine via official apt repository
         ├── ssh_mac/            # Deploy SSH keys + config to macOS
         └── ssh_linux/          # Inject public keys into authorized_keys
 ```
@@ -135,6 +141,7 @@ ansible-playbook playbooks/mac.yml --vault-password-file .vault_pass
 # Selective runs using tags
 ansible-playbook playbooks/mac.yml --vault-password-file .vault_pass --tags brew
 ansible-playbook playbooks/mac.yml --vault-password-file .vault_pass --tags dotfiles
+ansible-playbook playbooks/mac.yml --vault-password-file .vault_pass --tags shell
 ansible-playbook playbooks/mac.yml --vault-password-file .vault_pass --tags ssh
 ```
 
@@ -145,7 +152,7 @@ cd ~/dots/ansible
 
 # Edit inventory/hosts.ini first to add your server IPs, then:
 
-# Full provision (packages → shell → dotfiles → authorized_keys)
+# Full provision (packages → shell → dotfiles → Docker → authorized_keys)
 ansible-playbook playbooks/linux.yml \
   --vault-password-file .vault_pass \
   --ask-become-pass
@@ -155,6 +162,11 @@ ansible-playbook playbooks/linux.yml \
   -l vps \
   --vault-password-file .vault_pass \
   --ask-become-pass
+
+# Docker only
+ansible-playbook playbooks/linux.yml \
+  --vault-password-file .vault_pass \
+  --ask-become-pass --tags docker
 
 # Dry-run (check mode — no changes applied)
 ansible-playbook playbooks/linux.yml \
@@ -228,3 +240,13 @@ Add a `~/.zshrc.local` file (not committed to git) for secrets, tokens, or per-m
 - [ ] `~/.ssh/config` has `600` permissions
 - [ ] Private key files in `~/.ssh/` have `600` permissions
 - [ ] `no_log: true` is set on all tasks that handle private key content
+
+---
+
+## Friends & Colleagues
+
+See **[STRANGER.md](STRANGER.md)** for a self-contained guide that:
+
+- Uses `--skip-tags ssh` to skip all private key and vault operations
+- Includes a local inventory trick so Linux can be run on the same machine without a separate control node
+- Covers post-provisioning steps, troubleshooting, and how to update later
