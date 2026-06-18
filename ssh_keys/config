@@ -11,8 +11,9 @@ Host vps
     User vps
     IdentityFile ~/.ssh/id_ed25519_sk_key1
     IdentityAgent none
-# GitHub Authentication using FIDO2 Keys
+
 Host github.com
-    IdentityFile ~/.ssh/id_ed25519_sk_key1
-    IdentityFile ~/.ssh/id_ed25519_sk_key2
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_ansible
     IdentitiesOnly yes

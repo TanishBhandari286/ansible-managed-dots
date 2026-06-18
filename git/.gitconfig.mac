@@ -4,7 +4,7 @@
 # Linux machines never load this file.
 
 [user]
-	signingkey = ~/.ssh/id_ed25519_sk_key1.pub
+	signingkey = ~/.ssh/id_ed25519_ansible.pub
 
 [commit]
-	gpgsign = true
+	gpgsign = false
