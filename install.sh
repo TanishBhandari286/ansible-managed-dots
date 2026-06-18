@@ -47,8 +47,7 @@ link() {
 
   # Existing symlink — replace unconditionally (avoids readlink portability issues)
   if [[ -L "$dest" ]]; then
-    rm "$dest"
-    ln -sf "$src" "$dest"
+    ln -sfn "$src" "$dest"
     ok "$name"
     return
   fi
@@ -57,7 +56,7 @@ link() {
   if [[ -e "$dest" ]]; then
     mkdir -p "$BACKUP_DIR"
     info "Backing up $dest → $BACKUP_DIR/$name"
-    mv "$dest" "$BACKUP_DIR/$name"
+    mv "$dest" "$BACKUP_DIR/$name.$(date +%s)"
   fi
 
   ln -sf "$src" "$dest"
