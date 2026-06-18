@@ -1,0 +1,10 @@
+# macOS-specific Git config — signing with FIDO2/YubiKey SSH key.
+# This file is symlinked to ~/.gitconfig.local by install.sh on Darwin only.
+# It is loaded via [include] path = ~/.gitconfig.local in git/.gitconfig.
+# Linux machines never load this file.
+
+[user]
+	signingkey = ~/.ssh/id_ed25519_sk_key1.pub
+
+[commit]
+	gpgsign = true

@@ -1,0 +1,47 @@
+---
+# ---------------------------------------------------------------------------
+# Role: dotfiles — Clone the dotfiles repo and run install.sh
+# ---------------------------------------------------------------------------
+# This role has ONE job: ensure the dots repo exists on the target machine
+# and the symlinks are in place. It never copies file content — git owns
+# the content, install.sh owns the symlinks.
+#
+# Variables consumed:
+#   dotfiles_repo_url   — git remote (from group_vars/all/vars.yml)
+#   dotfiles_dir        — clone destination (set in playbook pre_tasks)
+#   user_home           — target user's home directory
+# ---------------------------------------------------------------------------
+
+# Ensure ~/.config exists before install.sh runs
+- name: Ensure ~/.config directory exists
+  ansible.builtin.file:
+    path: "{{ user_home }}/.config"
+    state: directory
+    mode: "0755"
+  become: false
+
+# Clone the repo only if it isn't already there.
+# update: false — Ansible does not pull; the user runs `git pull` manually.
+# This prevents Ansible from overwriting uncommitted local changes.
+- name: Clone dotfiles repository
+  ansible.builtin.git:
+    repo: "{{ dotfiles_repo_url }}"
+    dest: "{{ dotfiles_dir }}"
+    version: main
+    clone: true
+    update: false
+  become: false
+
+# Run install.sh on the target machine.
+# The script is OS-aware: creates shared symlinks on all platforms,
+# mac-only symlinks (aerospace, ghostty, starship, gitconfig.mac) on Darwin.
+- name: Run install.sh to create dotfile symlinks
+  ansible.builtin.command:
+    cmd: "{{ dotfiles_dir }}/install.sh"
+  become: false
+  register: install_out
+  changed_when: "'✓' in install_out.stdout"   # only changed when a new symlink was created
+
+- name: Show install.sh output
+  ansible.builtin.debug:
+    msg: "{{ install_out.stdout_lines }}"

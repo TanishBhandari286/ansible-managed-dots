@@ -1,69 +1,13 @@
 ---
 # ---------------------------------------------------------------------------
-# Role: dotfiles_linux — Push config files to remote, then symlink them
+# RETIRED — replaced by roles/dotfiles/
 # ---------------------------------------------------------------------------
-# All src: paths use lookup('env', 'HOME') to resolve the Mac control node's
-# local filesystem. copy: module always reads src from the control node.
-# All tasks run as the SSH login user (become: false) — no root access needed.
+# This role previously pushed dotfiles from the Mac control node and created
+# symlinks on Linux servers. Both responsibilities have been moved:
+#
+#   Content management → git clone in roles/dotfiles/
+#   Symlink creation   → install.sh (run by roles/dotfiles/)
+#
+# This file is intentionally empty. The role directory is kept to avoid
+# breaking any external references, but it is no longer called by linux.yml.
 # ---------------------------------------------------------------------------
-
-# ---- Ensure remote directory tree exists -----------------------------------
-- name: Ensure remote dotfiles_dir/.config exists
-  ansible.builtin.file:
-    path: "{{ dotfiles_dir }}/.config"
-    state: directory
-    mode: "0755"
-  become: false
-
-- name: Ensure remote dotfiles_dir/git exists
-  ansible.builtin.file:
-    path: "{{ dotfiles_dir }}/git"
-    state: directory
-    mode: "0755"
-  become: false
-
-- name: Ensure ~/.config directory exists
-  ansible.builtin.file:
-    path: "{{ user_home }}/.config"
-    state: directory
-    mode: "0755"
-  become: false
-
-# ---- Push config files from Mac control node to remote ---------------------
-# Note: copy with a directory src copies the directory *and its name* into dest.
-# Setting src to "nvim" (no trailing slash) copies it as dotfiles_dir/.config/nvim/
-- name: Push nvim config directory to remote dotfiles_dir/.config/
-  ansible.builtin.copy:
-    src: "{{ lookup('env', 'HOME') }}/dots/.config/nvim"
-    dest: "{{ dotfiles_dir }}/.config/"
-    mode: preserve
-  become: false
-  tags: [nvim]
-
-- name: Push .gitconfig to remote dotfiles_dir/git/
-  ansible.builtin.copy:
-    src: "{{ lookup('env', 'HOME') }}/dots/git/.gitconfig"
-    dest: "{{ dotfiles_dir }}/git/.gitconfig"
-    mode: "0644"
-  become: false
-  tags: [git]
-
-# ---- Neovim config symlink --------------------------------------------------
-- name: Symlink ~/.config/nvim
-  ansible.builtin.file:
-    src: "{{ dotfiles_dir }}/.config/nvim"
-    dest: "{{ user_home }}/.config/nvim"
-    state: link
-    force: true
-  become: false
-  tags: [nvim]
-
-# ---- Home-directory symlinks ------------------------------------------------
-- name: Symlink ~/.gitconfig
-  ansible.builtin.file:
-    src: "{{ dotfiles_dir }}/git/.gitconfig"
-    dest: "{{ user_home }}/.gitconfig"
-    state: link
-    force: true
-  become: false
-  tags: [git]

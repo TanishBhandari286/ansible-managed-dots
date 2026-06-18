@@ -1,60 +1,10 @@
 ---
 # ---------------------------------------------------------------------------
-# Role: dotfiles_mac — Symlink macOS-specific config files
+# RETIRED — replaced by roles/dotfiles/
 # ---------------------------------------------------------------------------
-# Symlinking strategy: ansible.builtin.file with state=link and force=true
-# is fully idempotent — it creates the symlink when absent and is a no-op
-# when the correct symlink already exists. No pre-deletion step is needed.
+# This role previously created macOS-specific symlinks. Symlink creation has
+# been moved to install.sh (run by roles/dotfiles/ after cloning the repo).
+#
+# This file is intentionally empty. The role directory is kept to avoid
+# breaking any external references, but it is no longer called by mac.yml.
 # ---------------------------------------------------------------------------
-
-# ---- Ensure ~/.config exists -----------------------------------------------
-- name: Ensure ~/.config directory exists
-  ansible.builtin.file:
-    path: "{{ user_home }}/.config"
-    state: directory
-    mode: "0755"
-
-# ---- AeroSpace -------------------------------------------------------------
-- name: Symlink ~/.config/aerospace
-  ansible.builtin.file:
-    src: "{{ dotfiles_dir }}/.config/aerospace"
-    dest: "{{ user_home }}/.config/aerospace"
-    state: link
-    force: true
-  tags: [aerospace]
-
-# ---- Ghostty ---------------------------------------------------------------
-- name: Symlink ~/.config/ghostty
-  ansible.builtin.file:
-    src: "{{ dotfiles_dir }}/.config/ghostty"
-    dest: "{{ user_home }}/.config/ghostty"
-    state: link
-    force: true
-  tags: [ghostty]
-
-# ---- Neovim ----------------------------------------------------------------
-- name: Symlink ~/.config/nvim
-  ansible.builtin.file:
-    src: "{{ dotfiles_dir }}/.config/nvim"
-    dest: "{{ user_home }}/.config/nvim"
-    state: link
-    force: true
-  tags: [nvim]
-
-# ---- Starship --------------------------------------------------------------
-- name: Symlink ~/.config/starship.toml
-  ansible.builtin.file:
-    src: "{{ dotfiles_dir }}/starship.toml"
-    dest: "{{ user_home }}/.config/starship.toml"
-    state: link
-    force: true
-  tags: [starship]
-
-# ---- Home-directory symlinks ------------------------------------------------
-- name: Symlink ~/.gitconfig
-  ansible.builtin.file:
-    src: "{{ dotfiles_dir }}/git/.gitconfig"
-    dest: "{{ user_home }}/.gitconfig"
-    state: link
-    force: true
-  tags: [git]

@@ -1,12 +1,22 @@
 # This is Git's per-user configuration file.
+# Shared across macOS and Linux — no OS-specific paths here.
+# OS-specific config (signing key, gpgsign) lives in git/.gitconfig.mac,
+# which install.sh symlinks to ~/.gitconfig.local on macOS only.
+
 [user]
-# Please adapt and uncomment the following lines:
 	name = tanishbhandari286
 	email = tanishbhandari91@gmail.com
-	signingkey = /Users/devops/.ssh/id_ed25519_sk_key1.pub
+
 [pull]
 	rebase = true
+
 [gpg]
 	format = ssh
-[commit]
-	gpgsign = true
+
+# Machine-local overrides (signing keys, per-machine settings).
+# On macOS: ~/.gitconfig.local -> dots/git/.gitconfig.mac  (created by install.sh)
+# On Linux: file does not exist; this include is silently ignored by git.
+[include]
+	path = ~/.gitconfig.local
+[core]
+	hooksPath = /Users/devops/.config/dotfiles-hooks

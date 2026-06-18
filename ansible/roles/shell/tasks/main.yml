@@ -1,9 +1,19 @@
 ---
 # ---------------------------------------------------------------------------
-# Role: shell — Install Zsh (Linux only), push .zshrc, and symlink it
+# Role: shell — Install Zsh and set it as the default shell
+# ---------------------------------------------------------------------------
+# Responsibilities:
+#   - apt install zsh (Linux only)
+#   - Ensure /etc/shells lists zsh (Linux only)
+#   - chsh to set zsh as the default shell (Linux only)
+#
+# NOT this role's job:
+#   - Pushing .zshrc                → install.sh (via dotfiles role)
+#   - Creating dotfiles_dir         → dotfiles role (git clone)
+#   - Creating ~/.config            → dotfiles role
 # ---------------------------------------------------------------------------
 
-# ---- Linux: install and set default shell --------------------------------
+# ---- Linux: install and set default shell ----------------------------------
 - name: "[Linux] Install Zsh via apt"
   ansible.builtin.apt:
     name: zsh
@@ -28,34 +38,3 @@
   become: true
   when: ansible_facts['os_family'] == "Debian"
   tags: [zsh_install]
-
-# ---- Push dotfiles to remote before symlinking -----------------------------
-# src: uses the Mac control node's local path (lookup runs on localhost).
-# The trailing slash on src is intentional: it copies the *contents*, not
-# the directory itself, so we copy .zshrc as a file, not a subdirectory.
-
-- name: "Ensure remote dotfiles_dir exists"
-  ansible.builtin.file:
-    path: "{{ dotfiles_dir }}"
-    state: directory
-    mode: "0755"
-  become: false
-  tags: [zshrc]
-
-- name: "Push .zshrc from control node to remote dotfiles_dir"
-  ansible.builtin.copy:
-    src: "{{ lookup('env', 'HOME') }}/dots/.zshrc"
-    dest: "{{ dotfiles_dir }}/.zshrc"
-    mode: "0644"
-  become: false
-  tags: [zshrc]
-
-# ---- Symlink .zshrc --------------------------------------------------------
-- name: "Symlink .zshrc to ~/"
-  ansible.builtin.file:
-    src: "{{ dotfiles_dir }}/.zshrc"
-    dest: "{{ user_home }}/.zshrc"
-    state: link
-    force: true
-  become: false
-  tags: [zshrc]
