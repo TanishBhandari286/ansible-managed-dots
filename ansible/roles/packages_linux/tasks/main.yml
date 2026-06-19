@@ -19,11 +19,42 @@
   become: true
   tags: [python, python314]
 
-- name: Add deadsnakes PPA for Python 3.14
-  ansible.builtin.apt_repository:
-    repo: ppa:deadsnakes/ppa
+- name: Ensure /etc/apt/keyrings exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+  become: true
+  when: ansible_facts['os_family'] == "Debian"
+  tags: [python, python314]
+
+- name: Download deadsnakes PPA GPG key
+  ansible.builtin.get_url:
+    url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xF23C5A6CF475977595C89F51BA6932366A755776"
+    dest: /etc/apt/keyrings/deadsnakes.asc
+    mode: "0644"
+  become: true
+  when: ansible_facts['os_family'] == "Debian"
+  tags: [python, python314]
+
+- name: Add deadsnakes PPA for Python 3.14 (deb822 format)
+  ansible.builtin.deb822_repository:
+    name: deadsnakes-ppa
+    types: [deb]
+    uris: "https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu"
+    # If on Debian, fallback to jammy to ensure packages can be found.
+    suites: ["{{ ansible_facts['distribution_release'] if ansible_facts['distribution'] == 'Ubuntu' else 'jammy' }}"]
+    components: [main]
+    signed_by: /etc/apt/keyrings/deadsnakes.asc
     state: present
-    update_cache: true
+    enabled: yes
+  become: true
+  when: ansible_facts['os_family'] == "Debian"
+  tags: [python, python314]
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
   become: true
   when: ansible_facts['os_family'] == "Debian"
   tags: [python, python314]
