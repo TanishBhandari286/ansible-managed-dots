@@ -8,6 +8,7 @@ $directory\
 $git_branch\
 $git_status\
 $nodejs\
+$python\
 $kubernetes\
 \n$character"""
 # Rosé Pine Palette
@@ -49,6 +50,11 @@ format = "[  $version ](bg:gold fg:base)[](fg:gold) "
 [kubernetes]
 disabled = false
 format = "[ 󱃾 $context ](bg:foam fg:base)[](fg:foam) "
+
+[python]
+format = "[  $version ](bg:iris fg:base)[](fg:iris) "
+pyenv_version_name = false
+detect_files = ["requirements.txt", "pyproject.toml", "setup.py", ".python-version"]
 
 [character]
 success_symbol = "[❯](bold pine)"

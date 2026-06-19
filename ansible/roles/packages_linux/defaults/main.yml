@@ -15,7 +15,12 @@ linux_packages:
   - fzf
   - tmux
   - htop
+  - bat
+  - tree
   - neovim
   - python3
   - python3-pip
   - build-essential
+  # Zsh plugins (syntax highlighting + autosuggestions)
+  - zsh-syntax-highlighting
+  - zsh-autosuggestions

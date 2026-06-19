@@ -1,8 +1,9 @@
 ---
 # ---------------------------------------------------------------------------
-# Role: packages_linux — Install essential apt packages on Ubuntu/Debian
+# Role: packages_linux — Install essential packages on Ubuntu/Debian
 # ---------------------------------------------------------------------------
 
+# ---- 1. Base apt packages --------------------------------------------------
 - name: Install base packages
   ansible.builtin.apt:
     name: "{{ linux_packages }}"
@@ -10,19 +11,204 @@
     update_cache: false   # cache already updated in playbook pre_tasks
   become: true
 
-- name: Install Neovim AppImage (latest stable) if nvim not in apt
-  block:
-    - name: Check nvim version available in apt
-      ansible.builtin.command: apt-cache show neovim
-      register: apt_nvim_check
-      failed_when: false
-      changed_when: false
+# ---- 2. Deadsnakes PPA → Python 3.14 ---------------------------------------
+- name: Install software-properties-common (for add-apt-repository)
+  ansible.builtin.apt:
+    name: software-properties-common
+    state: present
+  become: true
+  tags: [python, python314]
 
-    - name: Download Neovim AppImage when not in apt repos
-      ansible.builtin.get_url:
-        url: https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage
-        dest: /usr/local/bin/nvim
-        mode: "0755"
-      become: true
-      when: apt_nvim_check.rc != 0
-  tags: [nvim]
+- name: Add deadsnakes PPA for Python 3.14
+  ansible.builtin.apt_repository:
+    repo: ppa:deadsnakes/ppa
+    state: present
+    update_cache: true
+  become: true
+  when: ansible_facts['os_family'] == "Debian"
+  tags: [python, python314]
+
+- name: Install Python 3.14 from deadsnakes PPA
+  ansible.builtin.apt:
+    name:
+      - python3.14
+      - python3.14-venv
+      - python3.14-dev
+    state: present
+  become: true
+  when: ansible_facts['os_family'] == "Debian"
+  tags: [python, python314]
+
+# ---- 3. Neovim — latest AppImage -------------------------------------------
+- name: Check if nvim is already installed and get version
+  ansible.builtin.command: nvim --version
+  register: nvim_current_version
+  failed_when: false
+  changed_when: false
+  tags: [nvim, neovim]
+
+- name: Download latest Neovim AppImage
+  ansible.builtin.get_url:
+    url: https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage
+    dest: /usr/local/bin/nvim
+    mode: "0755"
+    force: true
+  become: true
+  when: nvim_current_version.rc != 0
+  tags: [nvim, neovim]
+
+# ---- 4. Eza — modern ls replacement ----------------------------------------
+- name: Check if eza is already installed and get version
+  ansible.builtin.command: eza --version
+  register: eza_current_version
+  failed_when: false
+  changed_when: false
+  tags: [eza]
+
+- name: Get latest eza release tag from GitHub
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/eza-community/eza/releases/latest
+    return_content: true
+    headers:
+      Accept: "application/vnd.github+json"
+  register: eza_release
+  tags: [eza]
+
+- name: Set eza version fact
+  ansible.builtin.set_fact:
+    eza_version: "{{ eza_release.json.tag_name | regex_replace('^v', '') }}"
+  tags: [eza]
+
+- name: Download eza binary
+  ansible.builtin.get_url:
+    url: "https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz"
+    dest: /tmp/eza.tar.gz
+    mode: "0644"
+  become: true
+  when: eza_current_version.rc != 0 or eza_version not in eza_current_version.stdout
+  tags: [eza]
+
+- name: Extract eza binary
+  ansible.builtin.unarchive:
+    src: /tmp/eza.tar.gz
+    dest: /usr/local/bin/
+    remote_src: true
+    extra_opts: ["--strip-components=0"]
+  become: true
+  when: eza_current_version.rc != 0 or eza_version not in eza_current_version.stdout
+  tags: [eza]
+
+- name: Ensure eza is executable
+  ansible.builtin.file:
+    path: /usr/local/bin/eza
+    mode: "0755"
+    owner: root
+    group: root
+  become: true
+  when: eza_current_version.rc != 0 or eza_version not in eza_current_version.stdout
+  tags: [eza]
+
+- name: Cleanup eza tarball
+  ansible.builtin.file:
+    path: /tmp/eza.tar.gz
+    state: absent
+  become: true
+  when: eza_current_version.rc != 0 or eza_version not in eza_current_version.stdout
+  tags: [eza]
+
+# ---- 5. Lazydocker ----------------------------------------------------------
+- name: Check if lazydocker is already installed and get version
+  ansible.builtin.command: lazydocker --version
+  register: lazydocker_current_version
+  failed_when: false
+  changed_when: false
+  tags: [lazydocker]
+
+- name: Get latest lazydocker release tag from GitHub
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/jesseduffield/lazydocker/releases/latest
+    return_content: true
+    headers:
+      Accept: "application/vnd.github+json"
+  register: lazydocker_release
+  tags: [lazydocker]
+
+- name: Set lazydocker version fact
+  ansible.builtin.set_fact:
+    lazydocker_version: "{{ lazydocker_release.json.tag_name | regex_replace('^v', '') }}"
+  tags: [lazydocker]
+
+- name: Download lazydocker binary
+  ansible.builtin.get_url:
+    url: "https://github.com/jesseduffield/lazydocker/releases/latest/download/lazydocker_{{ lazydocker_version }}_Linux_x86_64.tar.gz"
+    dest: /tmp/lazydocker.tar.gz
+    mode: "0644"
+  become: true
+  when: lazydocker_current_version.rc != 0 or lazydocker_version not in lazydocker_current_version.stdout
+  tags: [lazydocker]
+
+- name: Extract lazydocker binary
+  ansible.builtin.unarchive:
+    src: /tmp/lazydocker.tar.gz
+    dest: /usr/local/bin/
+    remote_src: true
+    include:
+      - lazydocker
+  become: true
+  when: lazydocker_current_version.rc != 0 or lazydocker_version not in lazydocker_current_version.stdout
+  tags: [lazydocker]
+
+- name: Ensure lazydocker is executable
+  ansible.builtin.file:
+    path: /usr/local/bin/lazydocker
+    mode: "0755"
+    owner: root
+    group: root
+  become: true
+  when: lazydocker_current_version.rc != 0 or lazydocker_version not in lazydocker_current_version.stdout
+  tags: [lazydocker]
+
+- name: Cleanup lazydocker tarball
+  ansible.builtin.file:
+    path: /tmp/lazydocker.tar.gz
+    state: absent
+  become: true
+  when: lazydocker_current_version.rc != 0 or lazydocker_version not in lazydocker_current_version.stdout
+  tags: [lazydocker]
+
+# ---- 6. Zoxide --------------------------------------------------------------
+- name: Check if zoxide is already installed
+  ansible.builtin.command: zoxide --version
+  register: zoxide_check
+  failed_when: false
+  changed_when: false
+  tags: [zoxide]
+
+- name: Install zoxide via official installer script
+  ansible.builtin.shell: |
+    curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+  args:
+    creates: "{{ user_home }}/.local/bin/zoxide"
+  environment:
+    HOME: "{{ user_home }}"
+  become: false
+  when: zoxide_check.rc != 0
+  tags: [zoxide]
+
+# ---- 7. Starship prompt (for Linux) ----------------------------------------
+- name: Check if starship is already installed
+  ansible.builtin.command: starship --version
+  register: starship_check
+  failed_when: false
+  changed_when: false
+  tags: [starship]
+
+- name: Install starship prompt via official installer
+  ansible.builtin.shell: |
+    curl -sSfL https://starship.rs/install.sh | sh -s -- --yes
+  become: true
+  when: starship_check.rc != 0
+  tags: [starship]
+
+# ---- 8. ripgrep, tmux — already in apt, verify install --------------------
+# (covered by base packages task above via linux_packages variable)
