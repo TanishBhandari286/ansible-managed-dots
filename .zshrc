@@ -200,7 +200,7 @@ bindkey '^]' autosuggest-execute                       # CTRL+] → accept + exe
 
 # ---- Zoxide -----------------------------------------------------------------
 if command -v zoxide &>/dev/null; then
-  eval "$(zoxide init zsh --cmd z)"
+  eval "$(zoxide init zsh --cmd cd)"
   # zi = interactive directory picker with fzf
 fi
 
