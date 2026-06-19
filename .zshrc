@@ -221,13 +221,10 @@ fi
 
 # ---- Bat (better cat) -------------------------------------------------------
 if command -v bat &>/dev/null; then
-  alias cat='bat --style=plain --paging=never'
-  alias bcat='bat'                                     # bat with full styling
-  export BAT_THEME="Catppuccin Mocha"
+  alias cat='bat --style=plain --paging=never'                                 # bat with full styling
 elif command -v batcat &>/dev/null; then
   alias cat='batcat --style=plain --paging=never'
-  alias bcat='batcat'                                  # bat with full styling
-  export BAT_THEME="Catppuccin Mocha"
+  alias bcat='batcat'                            
 fi
 
 # ---- Git shortcuts ----------------------------------------------------------
