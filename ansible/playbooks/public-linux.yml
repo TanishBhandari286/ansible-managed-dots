@@ -1,0 +1,30 @@
+---
+
+- name: Provision Linux workstation (Public Mode)
+  hosts: localhost
+  connection: local
+  gather_facts: true
+
+  pre_tasks:
+    - name: Verify we are running on Linux
+      ansible.builtin.assert:
+        that: ansible_facts['os_family'] in ["Debian", "RedHat", "Archlinux"]
+        fail_msg: "This playbook targets Debian/Ubuntu or RHEL-based Linux systems."
+
+    - name: Update apt cache (Debian/Ubuntu only)
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+      when: ansible_facts['os_family'] == "Debian"
+      become: true
+
+    - name: Set user_home
+      ansible.builtin.set_fact:
+        user_home: "/home/{{ ansible_facts['user_id'] }}"
+
+  roles:
+    - { role: packages,  become: true,  tags: [packages, apt] }
+    - { role: shell,     become: true,  tags: [shell, zsh] }
+    - { role: node,      become: true,  tags: [node, nodejs, devtools] }
+    - { role: docker,    become: true,  tags: [docker, containers] }
+    - { role: dotfiles,  become: false, tags: [dotfiles, symlinks, config] }

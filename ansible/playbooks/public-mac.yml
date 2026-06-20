@@ -1,0 +1,24 @@
+---
+
+- name: Provision macOS workstation (Public Mode)
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  become: false
+
+  pre_tasks:
+    - name: Verify we are running on macOS
+      ansible.builtin.assert:
+        that: ansible_facts['os_family'] == "Darwin"
+        fail_msg: "This playbook is for macOS only. Use public-linux.yml for Linux hosts."
+
+    - name: Set user_home
+      ansible.builtin.set_fact:
+        user_home: "/Users/{{ ansible_facts['user_id'] }}"
+
+  roles:
+    - role: packages
+      tags: [homebrew, brew, packages]
+
+    - role: dotfiles
+      tags: [dotfiles, symlinks, config]
