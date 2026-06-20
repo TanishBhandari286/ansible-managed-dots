@@ -17,10 +17,10 @@
         user_home: "/Users/{{ ansible_facts['user_id'] }}"
 
   roles:
-    - role: homebrew
-      tags: [homebrew, brew]
+    - role: packages
+      tags: [homebrew, brew, packages]
 
-    - role: ssh_mac
+    - role: ssh
       tags: [ssh, keys]
 
     - role: dotfiles

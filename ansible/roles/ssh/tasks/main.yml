@@ -1,0 +1,9 @@
+---
+
+- name: Include Linux specific tasks
+  ansible.builtin.include_tasks: linux.yml
+  when: ansible_facts['system'] == 'Linux'
+
+- name: Include Darwin specific tasks
+  ansible.builtin.include_tasks: darwin.yml
+  when: ansible_facts['system'] == 'Darwin'

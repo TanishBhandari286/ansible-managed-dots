@@ -22,11 +22,11 @@
         user_home: "/home/{{ ansible_user }}"
 
   roles:
-    - { role: packages_linux,  become: true,  tags: [packages, apt] }
+    - { role: packages,  become: true,  tags: [packages, apt] }
     - { role: shell,           become: true,  tags: [shell, zsh] }
-    - { role: node_linux,      become: true,  tags: [node, nodejs, devtools] }
-    - { role: docker_linux,    become: true,  tags: [docker, containers] }
+    - { role: node,      become: true,  tags: [node, nodejs, devtools] }
+    - { role: docker,    become: true,  tags: [docker, containers] }
 
-    - { role: ssh_linux,       become: false, tags: [ssh, keys] }
+    - { role: ssh,       become: false, tags: [ssh, keys] }
 
     - { role: dotfiles,        become: false, tags: [dotfiles, symlinks, config] }
