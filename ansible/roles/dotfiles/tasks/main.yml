@@ -42,7 +42,7 @@
     chdir: "{{ dotfiles_dir }}"
   become: false
   register: install_out
-  changed_when: "'✓' in install_out.stdout"
+  changed_when: false
 
 - name: Show install.sh output
   ansible.builtin.debug:

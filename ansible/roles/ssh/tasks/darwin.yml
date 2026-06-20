@@ -24,7 +24,7 @@
 - name: Add GitHub host key to ~/.ssh/known_hosts
   ansible.builtin.known_hosts:
     name: github.com
-    key: "{{ github_hostkey.stdout }}"
+    key: "{{ github_hostkey.stdout_lines | select('search', 'ssh-ed25519') | first }}"
     path: "{{ user_home }}/.ssh/known_hosts"
     state: present
   tags: [ssh_config]
