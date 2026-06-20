@@ -74,7 +74,7 @@ cask "clockify"
 # Web browser
 cask "macshot"
 cask "gcloud-cli"
-cask "firefox"
+cask "helium-browser"
 cask "font-jetbrains-mono"
 # Terminal emulator that uses platform-native UI and GPU acceleration
 cask "ghostty"
