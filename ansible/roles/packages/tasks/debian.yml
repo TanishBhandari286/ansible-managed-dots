@@ -30,6 +30,7 @@
     mode: "0644"
   become: true
   when: ansible_facts['os_family'] == "Debian"
+  changed_when: false
   tags: [python, python314]
 
 - name: Add deadsnakes PPA for Python 3.14 (deb822 format)
