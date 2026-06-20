@@ -18,6 +18,14 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/TanishBhandari286/ansibl
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/TanishBhandari286/ansible-managed-dots/main/bootstrap-public-linux.sh)"
 ```
 
+### What this will install:
+
+**Command Line Tools (Mac & Linux)**:
+`zsh`, `git`, `neovim`, `tmux`, `starship` (prompt), `eza` (modern `ls`), `bat` (modern `cat`), `fzf` (fuzzy finder), `ripgrep`, `fd`, `htop`, `python3`, `node.js`, `docker` (Linux only).
+
+**Mac Applications (Casks)**:
+`Ghostty` (terminal), `AeroSpace` (tiling window manager), `OrbStack` (Docker replacement), `VS Code`, `Obsidian`, `Raycast`, `Brave Browser`, `Proton Suite` (Mail, VPN, Drive, Pass), `Spotify`, `Stremio`, `WhatsApp`.
+
 ### What this will do:
 - Ask for your `sudo` password upfront to authorize installations.
 - Keep the `sudo` credential alive in the background so you are never prompted again.
