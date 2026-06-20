@@ -1,8 +1,4 @@
 ---
-# ---------------------------------------------------------------------------
-# Default variables for the packages_linux role
-# Override in group_vars/linux/vars.yml or host_vars/<host>.yml
-# ---------------------------------------------------------------------------
 
 linux_packages:
   - zsh
@@ -21,6 +17,5 @@ linux_packages:
   - python3
   - python3-pip
   - build-essential
-  # Zsh plugins (syntax highlighting + autosuggestions)
   - zsh-syntax-highlighting
   - zsh-autosuggestions

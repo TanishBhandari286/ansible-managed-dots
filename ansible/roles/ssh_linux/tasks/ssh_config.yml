@@ -1,29 +1,10 @@
 ---
-# ---------------------------------------------------------------------------
-# ssh_linux/tasks/ssh_config.yml
-# ---------------------------------------------------------------------------
-# 1. Ensure GitHub's host key is in ~/.ssh/known_hosts — required for any
-#    non-interactive SSH connection to github.com (git clone, git pull).
-#    We use ssh-keyscan rather than a hardcoded key so the fingerprint stays
-#    current if GitHub ever rotates its host key.
-#
-# 2. Ensure ~/.ssh/config contains a GitHub stanza pointing to the automation
-#    key — so Git picks up the right key without needing ssh-agent.
-#
-# Why blockinfile and not copy/template?
-#   Servers may already have a ~/.ssh/config with other hosts. blockinfile
-#   inserts only the marked block; never touches anything else. Idempotent.
-#
-# IdentitiesOnly yes  — prevents "Too many authentication failures" on hosts
-#                       with low MaxAuthTries when the agent has many keys.
-# ---------------------------------------------------------------------------
 
-# ---- GitHub known_hosts ----------------------------------------------------
 - name: Fetch GitHub host key via ssh-keyscan
   ansible.builtin.command:
     cmd: ssh-keyscan -t ed25519 github.com
   register: github_hostkey
-  changed_when: false   # read-only network operation
+  changed_when: false
   become: false
 
 - name: Add GitHub host key to ~/.ssh/known_hosts
@@ -34,7 +15,6 @@
     state: present
   become: false
 
-# ---- SSH client config -----------------------------------------------------
 - name: Ensure ~/.ssh/config exists
   ansible.builtin.file:
     path: "{{ user_home }}/.ssh/config"

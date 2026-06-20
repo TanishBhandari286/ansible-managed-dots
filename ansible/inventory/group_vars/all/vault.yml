@@ -1,13 +1,2 @@
-# ---------------------------------------------------------------------------
-# VAULT FILE — Encrypt this with: ansible-vault encrypt group_vars/all/vault.yml
-# ---------------------------------------------------------------------------
-# This file is a TEMPLATE.  After filling in values, encrypt it:
-#
-#   ansible-vault encrypt ansible/group_vars/all/vault.yml
-#
-# Variables defined here are automatically available to all plays.
-# ---------------------------------------------------------------------------
 
-# Passphrase used when the private key was registered with the FIDO2 token.
-# Leave empty string if your key has no passphrase (resident keys usually don't).
 vault_ssh_key_passphrase: ""

@@ -1,17 +1,12 @@
 ---
-# ---------------------------------------------------------------------------
-# Role: packages_linux — Install essential packages on Ubuntu/Debian
-# ---------------------------------------------------------------------------
 
-# ---- 1. Base apt packages --------------------------------------------------
 - name: Install base packages
   ansible.builtin.apt:
     name: "{{ linux_packages }}"
     state: present
-    update_cache: false   # cache already updated in playbook pre_tasks
+    update_cache: false
   become: true
 
-# ---- 2. Deadsnakes PPA → Python 3.14 ---------------------------------------
 - name: Install software-properties-common (for add-apt-repository)
   ansible.builtin.apt:
     name: software-properties-common
@@ -42,7 +37,6 @@
     name: deadsnakes-ppa
     types: [deb]
     uris: "https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu"
-    # If on Debian, fallback to jammy to ensure packages can be found.
     suites: ["{{ ansible_facts['distribution_release'] if ansible_facts['distribution'] == 'Ubuntu' else 'jammy' }}"]
     components: [main]
     signed_by: /etc/apt/keyrings/deadsnakes.asc
@@ -70,7 +64,6 @@
   when: ansible_facts['os_family'] == "Debian"
   tags: [python, python314]
 
-# ---- 3. Neovim — latest AppImage -------------------------------------------
 - name: Check if nvim is already installed and get version
   ansible.builtin.command: nvim --version
   register: nvim_current_version
@@ -88,7 +81,6 @@
   when: nvim_current_version.rc != 0
   tags: [nvim, neovim]
 
-# ---- 4. Eza — modern ls replacement ----------------------------------------
 - name: Check if eza is already installed and get version
   ansible.builtin.command: eza --version
   register: eza_current_version
@@ -147,7 +139,6 @@
   when: eza_current_version.rc != 0 or eza_version not in eza_current_version.stdout
   tags: [eza]
 
-# ---- 5. Lazydocker ----------------------------------------------------------
 - name: Check if lazydocker is already installed and get version
   ansible.builtin.command: lazydocker --version
   register: lazydocker_current_version
@@ -207,7 +198,6 @@
   when: lazydocker_current_version.rc != 0 or lazydocker_version not in lazydocker_current_version.stdout
   tags: [lazydocker]
 
-# ---- 6. Zoxide --------------------------------------------------------------
 - name: Check if zoxide is already installed
   ansible.builtin.command: zoxide --version
   register: zoxide_check
@@ -226,7 +216,6 @@
   when: zoxide_check.rc != 0
   tags: [zoxide]
 
-# ---- 7. Starship prompt (for Linux) ----------------------------------------
 - name: Check if starship is already installed
   ansible.builtin.command: starship --version
   register: starship_check
@@ -241,5 +230,3 @@
   when: starship_check.rc != 0
   tags: [starship]
 
-# ---- 8. ripgrep, tmux — already in apt, verify install --------------------
-# (covered by base packages task above via linux_packages variable)

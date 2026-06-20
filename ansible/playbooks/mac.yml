@@ -1,22 +1,10 @@
 ---
-# ---------------------------------------------------------------------------
-# macOS Provisioning Playbook
-# ---------------------------------------------------------------------------
-# Run: cd ~/dots/ansible && ansible-playbook playbooks/mac.yml
-#
-# What this playbook does:
-#   1. Installs Homebrew and runs the Brewfile
-#   2. Installs Zsh (no-op — already present on macOS)
-#   3. Clones ~/dots repo (idempotent) and runs install.sh to create symlinks
-#   4. Deploys SSH keys to ~/.ssh/ (owner only — skip with --skip-tags ssh)
-# ---------------------------------------------------------------------------
 
 - name: Provision macOS workstation
   hosts: localhost
   connection: local
   gather_facts: true
-  become: false   # macOS provisioning runs as the standard user throughout.
-                  # Homebrew, dotfiles, and SSH keys must NOT run as root.
+  become: false
 
   pre_tasks:
     - name: Verify we are running on macOS
@@ -32,7 +20,6 @@
     - role: homebrew
       tags: [homebrew, brew]
 
-    # SSH keys + known_hosts must be deployed before dotfiles attempts git clone
     - role: ssh_mac
       tags: [ssh, keys]
 

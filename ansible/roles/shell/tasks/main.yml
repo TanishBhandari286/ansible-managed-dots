@@ -1,19 +1,5 @@
 ---
-# ---------------------------------------------------------------------------
-# Role: shell — Install Zsh and set it as the default shell
-# ---------------------------------------------------------------------------
-# Responsibilities:
-#   - apt install zsh (Linux only)
-#   - Ensure /etc/shells lists zsh (Linux only)
-#   - chsh to set zsh as the default shell (Linux only)
-#
-# NOT this role's job:
-#   - Pushing .zshrc                → install.sh (via dotfiles role)
-#   - Creating dotfiles_dir         → dotfiles role (git clone)
-#   - Creating ~/.config            → dotfiles role
-# ---------------------------------------------------------------------------
 
-# ---- Linux: install and set default shell ----------------------------------
 - name: "[Linux] Install Zsh via apt"
   ansible.builtin.apt:
     name: zsh

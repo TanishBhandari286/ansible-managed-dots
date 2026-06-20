@@ -1,17 +1,4 @@
 ---
-# ---------------------------------------------------------------------------
-# Linux Provisioning Playbook
-# ---------------------------------------------------------------------------
-# Run: cd ~/dots/ansible && ansible-playbook playbooks/linux.yml
-#
-# What this playbook does:
-#   1. Installs apt packages (git, zsh, neovim, curl, ripgrep, fzf, tmux…)
-#   2. Installs Zsh and sets it as the default shell
-#   3. Installs Node.js 20 LTS + build-essential via NodeSource
-#   4. Installs Docker Engine via official apt repository
-#   5. Clones ~/dots repo (idempotent) and runs install.sh to create symlinks
-#   6. Injects FIDO2 public keys into authorized_keys (owner only — skip with --skip-tags ssh)
-# ---------------------------------------------------------------------------
 
 - name: Provision Linux servers / VPS
   hosts: linux
@@ -30,21 +17,16 @@
       when: ansible_facts['os_family'] == "Debian"
       become: true
 
-    # ansible_user is the inventory SSH login user (vps / master-node / server-node).
-    # With become=False globally, gather_facts runs as ansible_user.
     - name: Set user_home
       ansible.builtin.set_fact:
         user_home: "/home/{{ ansible_user }}"
 
   roles:
-    # System bootstrap — needs root
     - { role: packages_linux,  become: true,  tags: [packages, apt] }
     - { role: shell,           become: true,  tags: [shell, zsh] }
     - { role: node_linux,      become: true,  tags: [node, nodejs, devtools] }
     - { role: docker_linux,    become: true,  tags: [docker, containers] }
 
-    # SSH keys + known_hosts must be deployed before dotfiles attempts git clone
     - { role: ssh_linux,       become: false, tags: [ssh, keys] }
 
-    # Dotfiles — clones via SSH, runs install.sh
     - { role: dotfiles,        become: false, tags: [dotfiles, symlinks, config] }

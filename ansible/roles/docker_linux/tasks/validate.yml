@@ -1,13 +1,9 @@
 ---
-# ---------------------------------------------------------------------------
-# docker_linux/tasks/validate.yml
-# Verify Docker is functional. None of these tasks ever report "changed".
-# ---------------------------------------------------------------------------
 
 - name: Verify docker --version
   ansible.builtin.command: docker --version
   register: docker_version_out
-  changed_when: false   # read-only command; never a state change
+  changed_when: false
   become: false
 
 - name: Print docker version
@@ -24,10 +20,6 @@
   ansible.builtin.debug:
     msg: "{{ compose_version_out.stdout }}"
 
-# Run hello-world using the Docker socket directly via become:true so we do
-# not need the SSH session to have picked up the new docker group membership
-# (which requires a new login shell). changed_when: false because running a
-# container that exits immediately is verification, not a state mutation.
 - name: Run hello-world smoke test
   ansible.builtin.command: docker run --rm hello-world
   changed_when: false

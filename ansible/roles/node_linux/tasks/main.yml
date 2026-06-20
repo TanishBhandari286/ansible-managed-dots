@@ -1,9 +1,4 @@
 ---
-# ---------------------------------------------------------------------------
-# Role: node_linux — Install Node.js 20 LTS + build-essential on Debian/Ubuntu
-# ---------------------------------------------------------------------------
-# Skips entirely on non-Debian systems. Safe for mixed-OS inventories.
-# ---------------------------------------------------------------------------
 
 - name: Install Node.js 20 LTS and build tools
   ansible.builtin.import_tasks: install.yml

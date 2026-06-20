@@ -1,30 +1,12 @@
 ---
-# ---------------------------------------------------------------------------
-# node_linux/tasks/install.yml
-# Install Node.js 20 LTS via NodeSource + build-essential via apt.
-# ---------------------------------------------------------------------------
-# Strategy:
-#   NodeSource publishes a setup script that:
-#     1. Adds the NodeSource GPG key to /etc/apt/keyrings/
-#     2. Writes /etc/apt/sources.list.d/nodesource.list
-#     3. Runs apt-get update
-#   We download the script to /tmp, run it once, then install the package.
-#   Re-running is idempotent: the script overwrites the same files in place,
-#   apt install with state=present is a no-op when the package is current.
-# ---------------------------------------------------------------------------
 
-# ---- Prerequisites ---------------------------------------------------------
 - name: Install curl (required to fetch NodeSource setup script)
   ansible.builtin.apt:
     name: curl
     state: present
-    update_cache: false   # cache already updated in playbook pre_tasks
+    update_cache: false
   become: true
 
-# ---- NodeSource repository setup -------------------------------------------
-# Use the canonical NodeSource one-liner. The stat guard ensures this only
-# runs once — on subsequent plays nodesource.list already exists so the
-# shell task is skipped entirely (ok, not changed).
 - name: Check if NodeSource 20.x repo is already configured
   ansible.builtin.stat:
     path: /etc/apt/sources.list.d/nodesource.list
@@ -35,17 +17,15 @@
     cmd: curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
   become: true
   when: not nodesource_list.stat.exists
-  changed_when: true   # always mutates apt state when it runs
+  changed_when: true
 
-# ---- Node.js package -------------------------------------------------------
 - name: Install Node.js 20 LTS
   ansible.builtin.apt:
     name: nodejs
     state: present
-    update_cache: false   # NodeSource setup script already ran apt-get update
+    update_cache: false
   become: true
 
-# ---- Build toolchain -------------------------------------------------------
 - name: Install build-essential
   ansible.builtin.apt:
     name: build-essential

@@ -1,10 +1,4 @@
 ---
-# ---------------------------------------------------------------------------
-# Role: docker_linux — Install Docker Engine via official apt repository
-# ---------------------------------------------------------------------------
-# Skips entirely on non-Debian systems. All sub-task files use the same guard
-# so the role is safe to include in a play that targets mixed OS families.
-# ---------------------------------------------------------------------------
 
 - name: Install Docker Engine
   ansible.builtin.import_tasks: install.yml

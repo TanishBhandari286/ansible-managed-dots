@@ -1,9 +1,4 @@
 ---
-# ---------------------------------------------------------------------------
-# node_linux/tasks/verify.yml
-# Confirm Node.js 20 and npm are available and print their versions.
-# All tasks use changed_when: false — verification never mutates state.
-# ---------------------------------------------------------------------------
 
 - name: Get node version
   ansible.builtin.command: node --version

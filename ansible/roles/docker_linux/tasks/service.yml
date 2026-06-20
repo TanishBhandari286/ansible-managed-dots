@@ -1,8 +1,4 @@
 ---
-# ---------------------------------------------------------------------------
-# docker_linux/tasks/service.yml
-# Ensure the Docker daemon is enabled and running.
-# ---------------------------------------------------------------------------
 
 - name: Enable and start Docker service
   ansible.builtin.systemd:

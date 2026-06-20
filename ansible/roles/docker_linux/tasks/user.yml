@@ -1,12 +1,4 @@
 ---
-# ---------------------------------------------------------------------------
-# docker_linux/tasks/user.yml
-# Add the Ansible login user to the docker group.
-# ---------------------------------------------------------------------------
-# append: true is critical — it adds the user to the group without removing
-# them from any existing groups. Without it, the user module replaces the
-# entire group list with only 'docker'.
-# ---------------------------------------------------------------------------
 
 - name: Add {{ ansible_user }} to docker group
   ansible.builtin.user:

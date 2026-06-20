@@ -1,40 +1,13 @@
 ---
-# ---------------------------------------------------------------------------
-# Global variables — available to ALL hosts
-# ---------------------------------------------------------------------------
-# RULE: Only STATIC values live here. No ansible_facts, no Jinja2 expressions
-# that reference runtime state. group_vars is parsed before gather_facts runs,
-# so any dynamic expression here will fail or produce wrong values.
-#
-# user_home    — set in each playbook's pre_tasks via set_fact
-# dotfiles_dir — derived from user_home in each playbook's pre_tasks
-# ---------------------------------------------------------------------------
 
-# ---------------------------------------------------------------------------
-# Dotfiles Repository
-# ---------------------------------------------------------------------------
 
-# SSH URL — used for both initial clone and git remote set-url.
-# Requires id_ed25519_ansible to be deployed and ~/.ssh/config to have
-# a github.com stanza before the dotfiles role runs.
 dotfiles_repo_url: git@github.com:TanishBhandari286/ansible-managed-dots.git
 
-# ansible_facts['env']['HOME'] is the login user's home directory, sourced
-# from the shell environment gathered by gather_facts. Consistent across
-# macOS and Linux without hardcoding /home/ or /Users/ paths.
 dotfiles_dir: "{{ ansible_facts['user']['dir'] | default(ansible_facts['env']['HOME']) }}/dots"
 
-# ---------------------------------------------------------------------------
-# SSH Key Configuration
-# ---------------------------------------------------------------------------
 
-# M2M automation key — passphraseless, used by Ansible for all remote connections.
-# This key must be present in authorized_keys on every Linux target.
 ssh_automation_key: id_ed25519_ansible
 
-# FIDO2 interactive key pairs — deployed to ~/.ssh/ on macOS only.
-# These are for human-facing SSH sessions and Git commit signing.
-# Private keys are ansible-vault encrypted in the repo.
 ssh_key_pairs:
   - id_ed25519_sk_key1
   - id_ed25519_sk_key2
