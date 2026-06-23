@@ -1,0 +1,53 @@
+// Title
+Ansible Dotfiles Architecture
+
+// External Entities
+User [icon: user]
+GitHub Repository [icon: github]
+
+// Bootstrapping Phase
+Bootstrap Scripts [icon: terminal] {
+  bootstrap.sh
+  bootstrap-public-mac.sh
+  bootstrap-public-linux.sh
+}
+
+// Core Automation
+Ansible Provisioning [icon: settings] {
+  Playbooks [icon: list] {
+    mac.yml
+    linux.yml
+    public-mac.yml
+    public-linux.yml
+  }
+  
+  Roles [icon: layers] {
+    packages [icon: package]
+    shell [icon: terminal]
+    node [icon: code]
+    docker [icon: box]
+    ssh [icon: key]
+    dotfiles [icon: file]
+  }
+}
+
+// Destinations
+Target Systems [icon: monitor] {
+  macOS Workstation [icon: monitor]
+  Linux Server [icon: server]
+}
+
+// Execution Flow
+User > Bootstrap Scripts: Executes via curl bash
+Bootstrap Scripts > GitHub Repository: Clones dots repo
+Bootstrap Scripts > Playbooks: Triggers Ansible Playbook
+
+Playbooks > Roles: Orchestrates execution
+
+// Role Actions
+packages > Target Systems: Installs system packages (brew/apt)
+shell > Target Systems: Sets up Zsh & Starship prompt
+node > Target Systems: Installs Node.js environment
+docker > Linux Server: Configures Docker runtime
+ssh > Target Systems: Installs Private SSH Keys (Owner only)
+dotfiles > Target Systems: Symlinks configuration files
