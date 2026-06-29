@@ -288,3 +288,4 @@ fi
 # Source a local, machine-specific file that is NOT committed to the repo.
 # Use this for secrets, API keys, or per-machine customizations.
 [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
+eval "$(mise activate zsh)"

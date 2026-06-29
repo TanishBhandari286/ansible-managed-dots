@@ -63,6 +63,8 @@ brew "zsh-autosuggestions"
 brew "zsh-completions"
 # Fish shell like syntax highlighting for zsh
 brew "zsh-syntax-highlighting"
+brew "uv"
+brew "mise"
 # AeroSpace is an i3-like tiling window manager for macOS
 cask "nikitabobko/tap/aerospace"
 # Agent orchestration platform
@@ -108,7 +110,6 @@ cask "stremio"
 cask "visual-studio-code"
 # Native desktop client for WhatsApp
 cask "whatsapp"
-vscode "biomejs.biome"
 vscode "formulahendry.code-runner"
 vscode "ms-azuretools.vscode-containers"
 vscode "ms-kubernetes-tools.vscode-kubernetes-tools"
