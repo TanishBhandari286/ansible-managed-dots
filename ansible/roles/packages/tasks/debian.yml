@@ -7,6 +7,12 @@
     update_cache: false
   become: true
 
+- name: Set architecture-specific download suffixes
+  ansible.builtin.set_fact:
+    nvim_arch: "{{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else 'x86_64' }}"
+    eza_arch: "{{ 'aarch64' if ansible_facts['architecture'] == 'aarch64' else 'x86_64' }}"
+    lazydocker_arch: "{{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else 'x86_64' }}"
+
 - name: Install software-properties-common (for add-apt-repository)
   ansible.builtin.apt:
     name: software-properties-common
@@ -75,7 +81,7 @@
 
 - name: Download latest Neovim AppImage
   ansible.builtin.get_url:
-    url: https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage
+    url: https://github.com/neovim/neovim/releases/latest/download/nvim-linux-{{ nvim_arch }}.appimage
     dest: /usr/local/bin/nvim
     mode: "0755"
     force: true
@@ -106,7 +112,7 @@
 
 - name: Download eza binary
   ansible.builtin.get_url:
-    url: "https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz"
+    url: "https://github.com/eza-community/eza/releases/latest/download/eza_{{ eza_arch }}-unknown-linux-gnu.tar.gz"
     dest: /tmp/eza.tar.gz
     mode: "0644"
   become: true
@@ -164,7 +170,7 @@
 
 - name: Download lazydocker binary
   ansible.builtin.get_url:
-    url: "https://github.com/jesseduffield/lazydocker/releases/latest/download/lazydocker_{{ lazydocker_version }}_Linux_x86_64.tar.gz"
+    url: "https://github.com/jesseduffield/lazydocker/releases/latest/download/lazydocker_{{ lazydocker_version }}_Linux_{{ lazydocker_arch }}.tar.gz"
     dest: /tmp/lazydocker.tar.gz
     mode: "0644"
   become: true

@@ -71,7 +71,7 @@ cask "antigravity"
 cask "brave-browser"
 # Time tracking tool for agencies and freelancers
 cask "clockify"
-# Web browser
+# Screenshot and screen recording tool for macOS
 cask "macshot"
 cask "gcloud-cli"
 cask "helium-browser"

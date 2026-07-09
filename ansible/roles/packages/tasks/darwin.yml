@@ -32,10 +32,15 @@
     - brew_bin is not defined
     - brew_stat_intel.stat.exists or ansible_facts['architecture'] == "x86_64"
 
-- name: Install Brewfile bundle
-  ansible.builtin.command:
-    cmd: "{{ brew_bin }} bundle --file={{ dotfiles_dir }}/.config/Brewfile"
+- name: Install Brewfile bundle with Homebrew environment
+  ansible.builtin.shell: |
+    eval "$({{ brew_bin }} shellenv)"
+    {{ brew_bin }} bundle --file="{{ dotfiles_dir }}/.config/Brewfile"
   become: false
   register: brew_bundle_result
   changed_when: "'Installing' in brew_bundle_result.stdout or 'Upgrading' in brew_bundle_result.stdout"
+  environment:
+    HOMEBREW_NO_AUTO_UPDATE: "1"
+    HOMEBREW_NO_INSTALL_CLEANUP: "1"
+    HOMEBREW_NO_ENV_HINTS: "1"
   tags: [brew_bundle]

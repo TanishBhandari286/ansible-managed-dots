@@ -258,6 +258,8 @@ alias ...='cd ../..'
 alias ....='cd ../../..'
 alias path='echo -e ${PATH//:/\\n}'     # Pretty-print PATH entries
 alias reload='exec zsh'                  # Reload this config
+alias macansible='(cd ~/dots/ansible && ansible-playbook playbooks/mac.yml)'
+alias linuxansible='(cd ~/dots/ansible && ansible-playbook playbooks/linux.yml)'
 
 # ---- Editor -----------------------------------------------------------------
 export EDITOR='nvim'
