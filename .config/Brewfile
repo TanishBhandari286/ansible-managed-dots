@@ -6,8 +6,6 @@ tap "tw93/tap", trusted: true
 brew "age"
 # Clone of cat(1) with syntax highlighting and Git integration
 brew "bat"
-# Toolchain of the web
-brew "biome"
 # Modern, maintained replacement for ls
 brew "eza"
 # Simple, fast and user-friendly alternative to find
@@ -114,11 +112,7 @@ vscode "formulahendry.code-runner"
 vscode "ms-azuretools.vscode-containers"
 vscode "ms-kubernetes-tools.vscode-kubernetes-tools"
 vscode "ms-vscode-remote.remote-containers"
-vscode "ms-vscode.cpp-devtools"
-vscode "ms-vscode.cpptools"
-vscode "oderwat.indent-rainbow"
 vscode "redhat.vscode-yaml"
 vscode "rishitmohanty3.leetcode-dark"
-vscode "tal7aouy.rainbow-bracket"
 npm "eslint"
 npm "tree-sitter-cli"
