@@ -289,3 +289,4 @@ fi
 # Use this for secrets, API keys, or per-machine customizations.
 [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
 eval "$(mise activate zsh)"
+eval "$(omp completions zsh)"
