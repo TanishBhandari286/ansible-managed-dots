@@ -11,6 +11,7 @@ brew "eza"
 # Simple, fast and user-friendly alternative to find
 brew "fd"
 # Command-line fuzzy finder written in Go
+brew "go"
 brew "fzf"
 # GNU compiler collection
 brew "gcc"
