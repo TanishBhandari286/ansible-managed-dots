@@ -7,6 +7,11 @@
 ansible/.vault_pass
 *.vault_pass
 
+# --- SSH private keys — encrypted with sops, never plaintext -----------------
+ssh_keys/id_*
+!ssh_keys/id_*.pub
+!ssh_keys/id_*.enc
+
 # --- Ansible runtime artifacts -----------------------------------------------
 ansible/*.retry
 ansible/.cache/

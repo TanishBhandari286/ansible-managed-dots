@@ -4,24 +4,9 @@ Host *
     ServerAliveCountMax 3
     SetEnv TERM=xterm-256color
 
-Host vps
-    HostName 69.62.77.27
-    User vps
-    IdentityFile ~/.ssh/id_ed25519_ansible
-    IdentityAgent none
-
 Host github.com
     HostName github.com
     User git
-    IdentityFile ~/.ssh/id_ed25519_ansible
+    IdentityFile ~/.ssh/id_ed25519
 
-Host master-node
-    HostName 192.168.29.22
-    User master-node
-    IdentityFile ~/.ssh/id_ed25519_ansible
-
-Host server-node
-    HostName 192.168.29.11
-    User master-node
-    IdentityFile ~/.ssh/id_ed25519_ansible
-
+Include ~/.ssh/config.dots-local

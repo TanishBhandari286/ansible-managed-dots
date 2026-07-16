@@ -1,0 +1,16 @@
+# Copy this file to ~/.gitconfig.local and fill in your details.
+# It's included from git/.gitconfig and never committed.
+
+[user]
+	name = Your Name
+	email = you@example.com
+	signingkey = ~/.ssh/id_ed25519.pub
+
+[commit]
+	gpgsign = false
+
+# For macOS with YubiKey/FIDO2:
+# [user]
+# 	signingkey = ~/.ssh/id_ed25519_sk.pub
+# [gpg]
+# 	format = ssh

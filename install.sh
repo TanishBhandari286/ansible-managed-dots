@@ -78,7 +78,7 @@ case "$OS" in
     link "$DOTS_DIR/.config/nvim"           "$HOME/.config/nvim"
     link "$DOTS_DIR/.config/aerospace"      "$HOME/.config/aerospace"
     link "$DOTS_DIR/.config/ghostty"        "$HOME/.config/ghostty"
-    link "$DOTS_DIR/starship.toml"          "$HOME/.config/starship.toml"
+    link "$DOTS_DIR/.config/starship.toml"  "$HOME/.config/starship.toml"
     # Signing key + gpgsign — loaded via [include] path = ~/.gitconfig.local
     link "$DOTS_DIR/git/.gitconfig.mac"     "$HOME/.gitconfig.local"
     ;;

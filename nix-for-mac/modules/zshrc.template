@@ -1,0 +1,228 @@
+# =============================================================================
+# .zshrc — Feature-rich Zsh configuration (managed by Nix home-manager)
+# =============================================================================
+# Theme:    Catppuccin Mocha (FZF) + Rosé Pine (Starship prompt)
+# Features: fzf, syntax highlighting, autosuggestions, zoxide, eza
+# =============================================================================
+
+# ---- OS Detection -----------------------------------------------------------
+export ZSH_OS="$(uname -s)"
+
+# ---- Performance compinit ---------------------------------------------------
+autoload -Uz compinit
+if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+24) ]]; then
+  compinit -d "${ZDOTDIR:-$HOME}/.zcompdump"
+else
+  compinit -C -d "${ZDOTDIR:-$HOME}/.zcompdump"
+fi
+
+# ---- History ----------------------------------------------------------------
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=50000
+SAVEHIST=50000
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE
+setopt HIST_REDUCE_BLANKS
+setopt SHARE_HISTORY
+setopt APPEND_HISTORY
+setopt EXTENDED_HISTORY
+setopt INC_APPEND_HISTORY
+
+# ---- Path -------------------------------------------------------------------
+typeset -U path
+path=("$HOME/.local/bin" "$HOME/bin" "$HOME/.cargo/bin" "/opt/homebrew/bin" $path)
+
+# ---- Completion styling (Catppuccin Mocha) ----------------------------------
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*' special-dirs true
+zstyle ':completion:*' squeeze-slashes true
+zstyle ':completion:*:descriptions' format '%F{@mocha_mauve@}── %d ──%f'
+zstyle ':completion:*:warnings' format '%F{@mocha_red@}No matches for: %d%f'
+zstyle ':completion:*:messages' format '%F{@mocha_green@}%d%f'
+zstyle ':completion:*:corrections' format '%F{@mocha_peach@}%d (errors: %e)%f'
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*' rehash true
+
+# ---- Zsh options ------------------------------------------------------------
+setopt AUTO_CD
+setopt AUTO_PUSHD
+setopt PUSHD_IGNORE_DUPS
+setopt CORRECT
+setopt NO_BEEP
+
+# ---- Keybindings ------------------------------------------------------------
+bindkey -e
+bindkey '^[[A' history-search-backward
+bindkey '^[[B' history-search-forward
+bindkey '^[^[[C' forward-word
+bindkey '^[^[[D' backward-word
+bindkey '^[[H' beginning-of-line
+bindkey '^[[F' end-of-line
+
+# ---- FZF (Catppuccin Mocha) -------------------------------------------------
+export FZF_DEFAULT_OPTS="
+  --color=bg+:@mocha_surface0@,bg:@mocha_base@,spinner:@mocha_rosewater@,hl:@mocha_red@
+  --color=fg:@mocha_text@,header:@mocha_red@,info:@mocha_mauve@,pointer:@mocha_rosewater@
+  --color=marker:@mocha_lavender@,fg+:@mocha_text@,prompt:@mocha_mauve@,hl+:@mocha_red@
+  --color=selected-bg:@mocha_surface1@
+  --height=50%
+  --layout=reverse
+  --border=rounded
+  --border-label=' fzf '
+  --border-label-pos=3
+  --prompt='  '
+  --pointer=' '
+  --marker=' '
+  --info=right
+  --separator='─'
+  --scrollbar='│'
+"
+
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
+
+export FZF_CTRL_T_OPTS="
+  --preview 'bat --color=always --style=numbers,changes --line-range=:300 {}'
+  --preview-window 'right:55%:border-rounded'
+  --bind 'ctrl-/:change-preview-window(down|hidden|)'
+"
+
+export FZF_ALT_C_OPTS="
+  --preview 'eza --tree --color=always --icons --level=2 {}'
+  --preview-window 'right:45%:border-rounded'
+"
+
+export FZF_CTRL_R_OPTS="
+  --preview 'echo {}' --preview-window up:3:hidden:wrap
+  --bind 'ctrl-/:toggle-preview'
+  --bind 'ctrl-y:execute-silent(echo -n {2..} | pbcopy)+abort'
+  --color header:italic
+  --header 'CTRL-Y: copy  CTRL-/: toggle preview'
+"
+
+source @zshFzfKeyBindings@
+source @zshFzfCompletion@
+
+# ---- Zsh Syntax Highlighting -----------------------------------------------
+source @zshSyntaxHighlight@
+
+typeset -A ZSH_HIGHLIGHT_STYLES
+ZSH_HIGHLIGHT_STYLES[command]='fg=@mocha_green@,bold'
+ZSH_HIGHLIGHT_STYLES[alias]='fg=@mocha_green@,bold'
+ZSH_HIGHLIGHT_STYLES[builtin]='fg=@mocha_blue@,bold'
+ZSH_HIGHLIGHT_STYLES[function]='fg=@mocha_mauve@,bold'
+ZSH_HIGHLIGHT_STYLES[precommand]='fg=@mocha_peach@,bold'
+ZSH_HIGHLIGHT_STYLES[commandseparator]='fg=@mocha_red@'
+ZSH_HIGHLIGHT_STYLES[redirection]='fg=@mocha_pink@'
+ZSH_HIGHLIGHT_STYLES[arg0]='fg=@mocha_green@'
+ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=@mocha_green@'
+ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=@mocha_green@'
+ZSH_HIGHLIGHT_STYLES[dollar-quoted-argument]='fg=@mocha_peach@'
+ZSH_HIGHLIGHT_STYLES[back-quoted-argument]='fg=@mocha_mauve@'
+ZSH_HIGHLIGHT_STYLES[path]='fg=@mocha_sky@,underline'
+ZSH_HIGHLIGHT_STYLES[path_prefix]='fg=@mocha_sky@'
+ZSH_HIGHLIGHT_STYLES[globbing]='fg=@mocha_yellow@'
+ZSH_HIGHLIGHT_STYLES[history-expansion]='fg=@mocha_mauve@'
+ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=@mocha_red@,bold'
+ZSH_HIGHLIGHT_STYLES[reserved-word]='fg=@mocha_blue@'
+
+# ---- Zsh Autosuggestions ----------------------------------------------------
+source @zshAutosuggest@
+
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=@mocha_surface2@,italic'
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=50
+ZSH_AUTOSUGGEST_USE_ASYNC=true
+bindkey '^ ' autosuggest-accept
+bindkey '^]' autosuggest-execute
+
+# ---- Zoxide -----------------------------------------------------------------
+if command -v zoxide &>/dev/null; then
+  eval "$(zoxide init zsh --cmd cd)"
+fi
+
+# ---- Eza (modern ls) --------------------------------------------------------
+if command -v eza &>/dev/null; then
+  alias ls='eza --icons --group-directories-first --color=always'
+  alias ll='eza --icons --long --git --group-directories-first --color=always'
+  alias la='eza --icons --long --git --all --group-directories-first --color=always'
+  alias lt='eza --icons --tree --level=2 --color=always'
+  alias lta='eza --icons --tree --level=2 --all --color=always'
+  alias l='eza --icons --long --git --color=always'
+else
+  alias ls='ls --color=auto'
+  alias ll='ls -lhF --color=auto'
+  alias la='ls -lahF --color=auto'
+fi
+
+# ---- Bat (better cat) -------------------------------------------------------
+if command -v bat &>/dev/null; then
+  alias cat='bat --style=plain --paging=never'
+elif command -v batcat &>/dev/null; then
+  alias cat='batcat --style=plain --paging=never'
+  alias bcat='batcat'
+fi
+
+# ---- Git shortcuts ----------------------------------------------------------
+alias g='git'
+alias gs='git status'
+alias gl='git log --oneline --graph --decorate --all'
+alias gd='git diff'
+alias ga='git add .'
+alias gc='git commit'
+alias gp='git push -u origin main'
+alias gpl='git pull'
+alias gb='git branch'
+alias gco='git checkout'
+alias gsw='git switch'
+
+# ---- Docker / Lazydocker ----------------------------------------------------
+alias lzd='lazydocker'
+alias lzg='lazygit'
+alias dk='docker'
+alias dkc='docker compose'
+
+# ---- General aliases --------------------------------------------------------
+alias grep='grep --color=auto'
+alias vim='nvim'
+alias v='nvim'
+alias snvim='sudo -E nvim'
+alias c='clear'
+alias e='exit'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias path='echo -e ${PATH//:/\\n}'
+alias reload='exec zsh'
+alias macupdate='cd ~/dots/nix-for-mac && nix flake update && sudo darwin-rebuild switch --impure --flake ".#${NIX_HOST:-$(scutil --get LocalHostName)}"'
+alias macansible='(cd ~/dots/ansible && ansible-playbook playbooks/mac.yml)'
+alias linuxansible='(cd ~/dots/ansible && ansible-playbook playbooks/linux.yml)'
+
+# ---- Editor -----------------------------------------------------------------
+export EDITOR='nvim'
+export VISUAL='nvim'
+
+# ---- Language / Tool paths --------------------------------------------------
+[[ -d "$HOME/.npm-global/bin" ]] && path=("$HOME/.npm-global/bin" $path)
+[[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
+
+# ---- Starship prompt --------------------------------------------------------
+if command -v starship &>/dev/null; then
+  export STARSHIP_CONFIG="$HOME/.config/starship.toml"
+  eval "$(starship init zsh)"
+fi
+
+# ---- Mise (polyglot runtime manager) ----------------------------------------
+command -v mise &>/dev/null && eval "$(mise activate zsh)"
+
+# ---- Direnv -----------------------------------------------------------------
+command -v direnv &>/dev/null && eval "$(direnv hook zsh)"
+
+# ---- OMP (CommandCode) completions ------------------------------------------
+command -v omp &>/dev/null && eval "$(omp completions zsh)"
+
+# ---- Local overrides --------------------------------------------------------
+[[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"

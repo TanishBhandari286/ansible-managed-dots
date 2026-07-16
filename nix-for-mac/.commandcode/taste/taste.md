@@ -2,5 +2,3 @@
 
 [cmd]: https://commandcode.ai/
 
-# nix
-See [nix/taste.md](nix/taste.md)

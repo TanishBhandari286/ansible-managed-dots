@@ -1,0 +1,5 @@
+creation_rules:
+  - path_regex: ssh_keys/.*
+    age: >-
+      age1re4a8rm4r0j0254cjcexjgafuwu3ugptgk0enxf7t6wv6mf89ylqck2fgp,
+      age1uqlua5jqwxh3gyvqwsxpm7mdkymrs8snft0dcf5gxrs7lqz0pq9qqdzx0u
