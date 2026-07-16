@@ -7,6 +7,6 @@ Host *
 Host github.com
     HostName github.com
     User git
-    IdentityFile ~/.ssh/id_ed25519
+    IdentityFile ~/.ssh/id_ed25519_ansible
 
 Include ~/.ssh/config.dots-local
