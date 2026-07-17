@@ -27,16 +27,6 @@
       modules = [
         ./modules/darwin.nix
         home-manager.darwinModules.home-manager
-        ({ lib, ... }: {
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
-          home-manager.backupFileExtension = "nix-bak";
-          home-manager.users.${username} = {
-            home.homeDirectory = lib.mkForce "/Users/${username}";
-            imports = [ ./modules/home.nix ];
-          };
-          home-manager.extraSpecialArgs = { inherit dotsPath username; };
-        })
       ];
     };
   };
