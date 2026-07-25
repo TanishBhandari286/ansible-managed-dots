@@ -5,7 +5,8 @@
 {
   homebrew = {
     enable = true;
-    onActivation.cleanup = "none";
+    onActivation.autoUpdate = true;
+    onActivation.cleanup = "zap";
 
     taps = [
       "nikitabobko/tap"
@@ -30,7 +31,6 @@
       "brave-browser"
       "font-jetbrains-mono"
       "gcloud-cli"
-      "helium-browser"
       "iina"
       "obs"
       "obsidian"
@@ -41,6 +41,7 @@
       "whatsapp"
       "zap"
       "zed"
+      "firefox"
     ];
 
     masApps = { };

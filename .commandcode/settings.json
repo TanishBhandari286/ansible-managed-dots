@@ -2,7 +2,30 @@
   "permissions": {
     "allow": [
       "Shell(ls -la /run/current-system/sw/bin/git 2>&1; echo \"---\"; which git; echo \"---\"; echo $PATH | tr ':' '\\n' | head -20)",
-      "Shell(timeout 2 git --version 2>&1; echo \"exit: $?\")"
+      "Shell(timeout 2 git --version 2>&1; echo \"exit: $?\")",
+      "Shell(ssh -G vps 2 >& 1)",
+      "Shell(ssh -G master-node 2 >& 1)",
+      "Shell(ssh -V 2>&1; echo \"---\"; ls -la ~/.ssh/config; echo \"---\"; ls -la ~/.ssh/; echo \"---\"; xattr -l ~/.ssh/config 2>&1)",
+      "Shell(ssh -vvv -G vps 2 >& 1)",
+      "Shell(grep:*)",
+      "Shell(cat > /tmp/test_ssh_config << 'EOF' Host github.com HostName github.com User git IdentityFile ~/.ssh/id_ed25519_ansible Include /Users/devops/.ssh/config.dots-local EOF ssh -F /tmp/test_ssh_config -G vps 2>&1 | grep -E \"^(hostname|user|identityfile|host )\")",
+      "Shell(cat > /tmp/test_ssh_config << 'EOF' Host vps HostName 69.62.77.27 User vps IdentityFile ~/.ssh/id_ed25519_ansible IdentityAgent none Host master-node HostName 192.168.29.22 User master-node IdentityFile ~/.ssh/id_ed25519_ansible EOF ssh -F /tmp/test_ssh_config -G vps 2>&1 | grep -E \"^(hostname|user|identityfile|host )\")",
+      "Shell(xxd:*)",
+      "Shell(cat > /tmp/test_ssh_config << 'EOF' Include /Users/devops/.ssh/config.dots-local EOF ssh -F /tmp/test_ssh_config -G vps 2>&1 | grep -E \"^(hostname|user|identityfile|host )\")",
+      "Shell(cat > /tmp/test_ssh_config << 'EOF' Host * IdentitiesOnly yes Include /Users/devops/.ssh/config.dots-local EOF ssh -F /tmp/test_ssh_config -G vps 2>&1 | grep -E \"^(hostname|user|identityfile|host )\")",
+      "Shell(cat > /tmp/test_ssh_config << 'EOF' Host * IdentitiesOnly yes ServerAliveInterval 60 ServerAliveCountMax 3 SetEnv TERM=xterm-256color Host github.com HostName github.com User git IdentityFile ~/.ssh/id_ed25519_ansible Include ~/.ssh/config.dots-local EOF ssh -F /tmp/test_ssh_config -G vps 2>&1 | grep -E \"^(hostname|user|identityfile|host )\")",
+      "Shell(cat > /tmp/test_ssh_config << 'EOF' Host * IdentitiesOnly yes ServerAliveInterval 60 ServerAliveCountMax 3 SetEnv TERM=xterm-256color Host github.com HostName github.com User git IdentityFile ~/.ssh/id_ed25519_ansible Include /Users/devops/.ssh/config.dots-local EOF ssh -F /tmp/test_ssh_config -G vps 2>&1 | grep -E \"^(hostname|user|identityfile|host )\")",
+      "Shell(cat > /tmp/test_ssh_config << 'EOF' Include /Users/devops/.ssh/config.dots-local Host * IdentitiesOnly yes ServerAliveInterval 60 ServerAliveCountMax 3 SetEnv TERM=xterm-256color Host github.com HostName github.com User git IdentityFile ~/.ssh/id_ed25519_ansible EOF ssh -F /tmp/test_ssh_config -G vps 2>&1 | grep -E \"^(hostname|user|identityfile|host )\")",
+      "Shell(cat > /tmp/test_ssh_config << 'EOF' Host * IdentitiesOnly yes Host github.com HostName github.com User git IdentityFile ~/.ssh/id_ed25519_ansible Include /Users/devops/.ssh/config.dots-local EOF ssh -F /tmp/test_ssh_config -G vps 2>&1 | grep -E \"^(hostname|user|identityfile|host )\")",
+      "Shell(cat > /tmp/test_ssh_config << 'EOF' Host github.com HostName github.com User git IdentityFile ~/.ssh/id_ed25519_ansible Include /Users/devops/.ssh/config.dots-local Host * IdentitiesOnly yes ServerAliveInterval 60 ServerAliveCountMax 3 SetEnv TERM=xterm-256color EOF ssh -F /tmp/test_ssh_config -G vps 2>&1 | grep -E \"^(hostname|user|identityfile|host )\")",
+      "Shell(#:*)",
+      "Shell(sudo darwin-rebuild switch --flake . 2 >& 1)",
+      "Shell(ssh -F /Users/devops/dots/ssh_keys/config -G vps 2 >& 1)",
+      "Shell(ssh -F /Users/devops/dots/ssh_keys/config -G master-node 2 >& 1)",
+      "Shell(ssh -F /Users/devops/dots/ssh_keys/config -G server-node 2 >& 1)",
+      "Shell(ssh -F /Users/devops/dots/ssh_keys/config -G github.com 2 >& 1)",
+      "Shell(nix:*)",
+      "Shell(find:*)"
     ],
     "deny": [],
     "defaultMode": "default"

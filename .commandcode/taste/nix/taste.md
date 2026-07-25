@@ -8,3 +8,5 @@
 - Follow dendritic/lean Nix module structure: split monoliths (darwin.nix, home.nix) into small focused sub-modules under system/ and home/ directories, each imported by a thin entry-point module. Confidence: 0.75
 - Maintain two separate SSH key encryption paths: sops (.enc) for local nix-darwin/home-manager bootstrap, Ansible Vault for Linux managed machines. Both are intentional and serve different provisioning targets. Confidence: 0.80
 - nix home-manager must be run with sudo. Confidence: 0.70
+- SSH config: place the `Include` directive at the very top of the file, before any `Host` blocks. On OpenSSH 10.4+, an Include placed after a `Host *` block causes the included Host entries to silently fail matching (they get default values instead of their configured hostname/user/identityfile). Confidence: 0.75
+- Homebrew onActivation.cleanup should be set to "zap" (not "none" or "uninstall") — any formula, cask, or tap not declared in the Nix homebrew module should be aggressively removed on rebuild to keep the system fully declarative. Confidence: 0.85
