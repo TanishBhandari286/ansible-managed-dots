@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Shell(ls -la /run/current-system/sw/bin/git 2>&1; echo \"---\"; which git; echo \"---\"; echo $PATH | tr ':' '\\n' | head -20)",
+      "Shell(timeout 2 git --version 2>&1; echo \"exit: $?\")"
+    ],
+    "deny": [],
+    "defaultMode": "default"
+  }
+}
