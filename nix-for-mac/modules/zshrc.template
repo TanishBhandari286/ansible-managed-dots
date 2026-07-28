@@ -1,7 +1,8 @@
 # =============================================================================
 # .zshrc — Feature-rich Zsh configuration (managed by Nix home-manager)
 # =============================================================================
-# Theme:    Catppuccin Mocha (FZF) + Rosé Pine (Starship prompt)
+# Theme:  Tokyo Night (Storm) — matches the Ghostty "TokyoNight Storm" theme
+# Prompt: spaceship-prompt
 # Features: fzf, syntax highlighting, autosuggestions, zoxide, eza
 # =============================================================================
 
@@ -32,16 +33,16 @@ setopt INC_APPEND_HISTORY
 typeset -U path
 path=("$HOME/.local/bin" "$HOME/bin" "$HOME/.cargo/bin" "/opt/homebrew/bin" $path)
 
-# ---- Completion styling (Catppuccin Mocha) ----------------------------------
+# ---- Completion styling (Tokyo Night) ----------------------------------------
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 zstyle ':completion:*' special-dirs true
 zstyle ':completion:*' squeeze-slashes true
-zstyle ':completion:*:descriptions' format '%F{@mocha_mauve@}── %d ──%f'
-zstyle ':completion:*:warnings' format '%F{@mocha_red@}No matches for: %d%f'
-zstyle ':completion:*:messages' format '%F{@mocha_green@}%d%f'
-zstyle ':completion:*:corrections' format '%F{@mocha_peach@}%d (errors: %e)%f'
+zstyle ':completion:*:descriptions' format '%F{@tn_purple@}── %d ──%f'
+zstyle ':completion:*:warnings' format '%F{@tn_red@}No matches for: %d%f'
+zstyle ':completion:*:messages' format '%F{@tn_green@}%d%f'
+zstyle ':completion:*:corrections' format '%F{@tn_orange@}%d (errors: %e)%f'
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*' rehash true
 
@@ -61,12 +62,12 @@ bindkey '^[^[[D' backward-word
 bindkey '^[[H' beginning-of-line
 bindkey '^[[F' end-of-line
 
-# ---- FZF (Catppuccin Mocha) -------------------------------------------------
+# ---- FZF (Tokyo Night) --------------------------------------------------------
 export FZF_DEFAULT_OPTS="
-  --color=bg+:@mocha_surface0@,bg:@mocha_base@,spinner:@mocha_rosewater@,hl:@mocha_red@
-  --color=fg:@mocha_text@,header:@mocha_red@,info:@mocha_mauve@,pointer:@mocha_rosewater@
-  --color=marker:@mocha_lavender@,fg+:@mocha_text@,prompt:@mocha_mauve@,hl+:@mocha_red@
-  --color=selected-bg:@mocha_surface1@
+  --color=bg+:@tn_bg_highlight@,bg:@tn_bg@,spinner:@tn_cyan@,hl:@tn_red@
+  --color=fg:@tn_fg@,header:@tn_red@,info:@tn_purple@,pointer:@tn_cyan@
+  --color=marker:@tn_blue@,fg+:@tn_fg@,prompt:@tn_purple@,hl+:@tn_red@
+  --color=selected-bg:@tn_bg_highlight@
   --height=50%
   --layout=reverse
   --border=rounded
@@ -110,29 +111,29 @@ source @zshFzfCompletion@
 source @zshSyntaxHighlight@
 
 typeset -A ZSH_HIGHLIGHT_STYLES
-ZSH_HIGHLIGHT_STYLES[command]='fg=@mocha_green@,bold'
-ZSH_HIGHLIGHT_STYLES[alias]='fg=@mocha_green@,bold'
-ZSH_HIGHLIGHT_STYLES[builtin]='fg=@mocha_blue@,bold'
-ZSH_HIGHLIGHT_STYLES[function]='fg=@mocha_mauve@,bold'
-ZSH_HIGHLIGHT_STYLES[precommand]='fg=@mocha_peach@,bold'
-ZSH_HIGHLIGHT_STYLES[commandseparator]='fg=@mocha_red@'
-ZSH_HIGHLIGHT_STYLES[redirection]='fg=@mocha_pink@'
-ZSH_HIGHLIGHT_STYLES[arg0]='fg=@mocha_green@'
-ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=@mocha_green@'
-ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=@mocha_green@'
-ZSH_HIGHLIGHT_STYLES[dollar-quoted-argument]='fg=@mocha_peach@'
-ZSH_HIGHLIGHT_STYLES[back-quoted-argument]='fg=@mocha_mauve@'
-ZSH_HIGHLIGHT_STYLES[path]='fg=@mocha_sky@,underline'
-ZSH_HIGHLIGHT_STYLES[path_prefix]='fg=@mocha_sky@'
-ZSH_HIGHLIGHT_STYLES[globbing]='fg=@mocha_yellow@'
-ZSH_HIGHLIGHT_STYLES[history-expansion]='fg=@mocha_mauve@'
-ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=@mocha_red@,bold'
-ZSH_HIGHLIGHT_STYLES[reserved-word]='fg=@mocha_blue@'
+ZSH_HIGHLIGHT_STYLES[command]='fg=@tn_green@,bold'
+ZSH_HIGHLIGHT_STYLES[alias]='fg=@tn_green@,bold'
+ZSH_HIGHLIGHT_STYLES[builtin]='fg=@tn_blue@,bold'
+ZSH_HIGHLIGHT_STYLES[function]='fg=@tn_purple@,bold'
+ZSH_HIGHLIGHT_STYLES[precommand]='fg=@tn_orange@,bold'
+ZSH_HIGHLIGHT_STYLES[commandseparator]='fg=@tn_red@'
+ZSH_HIGHLIGHT_STYLES[redirection]='fg=@tn_magenta2@'
+ZSH_HIGHLIGHT_STYLES[arg0]='fg=@tn_green@'
+ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=@tn_green@'
+ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=@tn_green@'
+ZSH_HIGHLIGHT_STYLES[dollar-quoted-argument]='fg=@tn_orange@'
+ZSH_HIGHLIGHT_STYLES[back-quoted-argument]='fg=@tn_purple@'
+ZSH_HIGHLIGHT_STYLES[path]='fg=@tn_cyan@,underline'
+ZSH_HIGHLIGHT_STYLES[path_prefix]='fg=@tn_cyan@'
+ZSH_HIGHLIGHT_STYLES[globbing]='fg=@tn_yellow@'
+ZSH_HIGHLIGHT_STYLES[history-expansion]='fg=@tn_magenta@'
+ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=@tn_red@,bold'
+ZSH_HIGHLIGHT_STYLES[reserved-word]='fg=@tn_blue@'
 
 # ---- Zsh Autosuggestions ----------------------------------------------------
 source @zshAutosuggest@
 
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=@mocha_surface2@,italic'
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=@tn_comment@,italic'
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=50
 ZSH_AUTOSUGGEST_USE_ASYNC=true
@@ -198,7 +199,6 @@ alias ....='cd ../../..'
 alias path='echo -e ${PATH//:/\\n}'
 alias reload='exec zsh'
 alias macupdate='cd ~/dots/nix-for-mac && nix flake update && sudo darwin-rebuild switch --impure --flake ".#${NIX_HOST:-$(scutil --get LocalHostName)}"'
-alias macansible='(cd ~/dots/ansible && ansible-playbook playbooks/mac.yml)'
 alias linuxansible='(cd ~/dots/ansible && ansible-playbook playbooks/linux.yml)'
 
 # ---- Editor -----------------------------------------------------------------
@@ -209,20 +209,51 @@ export VISUAL='nvim'
 [[ -d "$HOME/.npm-global/bin" ]] && path=("$HOME/.npm-global/bin" $path)
 [[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
 
-# ---- Starship prompt --------------------------------------------------------
-if command -v starship &>/dev/null; then
-  export STARSHIP_CONFIG="$HOME/.config/starship.toml"
-  eval "$(starship init zsh)"
-fi
-
 # ---- Mise (polyglot runtime manager) ----------------------------------------
 command -v mise &>/dev/null && eval "$(mise activate zsh)"
 
 # ---- Direnv -----------------------------------------------------------------
 command -v direnv &>/dev/null && eval "$(direnv hook zsh)"
 
-# ---- OMP (CommandCode) completions ------------------------------------------
+# ---- OMP (oh-my-pi coding agent) completions --------------------------------
 command -v omp &>/dev/null && eval "$(omp completions zsh)"
+
+# ---- Spaceship prompt (Tokyo Night colors) ----------------------------------
+SPACESHIP_PROMPT_ORDER=(
+  user
+  dir
+  host
+  git
+  node
+  python
+  docker
+  docker_compose
+  kubectl
+  exec_time
+  line_sep
+  jobs
+  exit_code
+  sudo
+  char
+)
+SPACESHIP_PROMPT_ADD_NEWLINE=true
+SPACESHIP_PROMPT_SEPARATE_LINE=true
+SPACESHIP_CHAR_SYMBOL='❯'
+SPACESHIP_CHAR_COLOR_SUCCESS='@tn_green@'
+SPACESHIP_CHAR_COLOR_FAILURE='@tn_red@'
+SPACESHIP_USER_SHOW='needed'
+SPACESHIP_HOST_SHOW='ssh'
+SPACESHIP_DIR_COLOR='@tn_blue@'
+SPACESHIP_GIT_BRANCH_COLOR='@tn_purple@'
+SPACESHIP_GIT_STATUS_COLOR='@tn_orange@'
+SPACESHIP_NODE_COLOR='@tn_green@'
+SPACESHIP_PYTHON_COLOR='@tn_cyan@'
+SPACESHIP_DOCKER_COLOR='@tn_blue@'
+SPACESHIP_KUBECTL_CONTEXT_COLOR='@tn_teal@'
+SPACESHIP_EXEC_TIME_COLOR='@tn_yellow@'
+SPACESHIP_EXIT_CODE_SHOW=true
+SPACESHIP_EXIT_CODE_COLOR='@tn_red@'
+source @zshSpaceshipPrompt@
 
 # ---- Local overrides --------------------------------------------------------
 [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"

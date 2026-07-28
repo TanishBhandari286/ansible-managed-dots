@@ -59,7 +59,7 @@ git add ~/dots/ssh_keys/id_ed25519.enc
 
 | Category | What you get |
 |----------|-------------|
-| **Shell** | zsh, zsh-completions, zsh-autosuggestions, zsh-syntax-highlighting, tmux, starship |
+| **Shell** | zsh, zsh-completions, zsh-autosuggestions, zsh-syntax-highlighting, tmux |
 | **Core replacements** | bat (cat), eza (ls), fd (find), ripgrep (grep), bottom (top), htop, tree |
 | **Git ecosystem** | git, delta (diff viewer), lazygit, gh (GitHub CLI) |
 | **Languages** | go + gopls, rustup, nodejs_22, bun, pnpm, python314, uv, cmake, llvm openmp |
@@ -67,6 +67,8 @@ git add ~/dots/ssh_keys/id_ed25519.enc
 | **Editor** | neovim, tree-sitter |
 | **Navigation** | fzf, zoxide, mise |
 | **System** | stow, topgrade, pkg-config, direnv, nil (Nix LSP), sops |
+
+Prompt is [spaceship-prompt](https://github.com/spaceship-prompt/spaceship-prompt), pinned via `pkgs.fetchFromGitHub` in `home/zsh.nix` (it isn't in nixpkgs, so it's fetched directly rather than listed above).
 
 ### GUI apps (via Homebrew casks)
 
@@ -82,7 +84,7 @@ git add ~/dots/ssh_keys/id_ed25519.enc
 
 ### Homebrew formulae (CLI via brew)
 
-`omp` (CommandCode CLI), `mole`, `sshs`, `portal`, plus taps for nikitabobko, barutsrb, can1357, tw93.
+`omp` ([oh-my-pi](https://omp.sh) coding agent), `mole`, `sshs`, `portal`, plus taps for nikitabobko, barutsrb, can1357, tw93.
 
 ### macOS system defaults
 
@@ -99,7 +101,6 @@ git add ~/dots/ssh_keys/id_ed25519.enc
 |--------|------------|
 | `.zshrc` | `~/.zshrc` (Nix-generated from template with store paths injected) |
 | `.gitconfig` | `~/.gitconfig` (includes `~/.gitconfig.local` for personal details) |
-| `starship.toml` | `~/.config/starship.toml` |
 | Ghostty config | `~/.config/ghostty/config` |
 | Aerospace | `~/.config/aerospace/aerospace.toml` |
 | Neovim (LazyVim) | `~/.config/nvim/` |
@@ -109,6 +110,7 @@ git add ~/dots/ssh_keys/id_ed25519.enc
 
 - **direnv** — with nix-direnv integration
 - **htop** — enabled via home-manager module
+- **command-code** — installed/updated via an `home.activation` script (`home/npm-globals.nix`) since it's an npm global, not a nixpkgs package
 
 ---
 
@@ -125,12 +127,13 @@ git add ~/dots/ssh_keys/id_ed25519.enc
 | Add/remove a dotfile symlink | `modules/home/files.nix` | `home.file.*` or `xdg.configFile.*` |
 | Change zsh config | `modules/zshrc.template` | Template uses `@var@` placeholders for Nix store paths |
 | Change zsh source paths | `modules/home/zsh.nix` | Maps `@var@` → Nix store paths via `replaceVars` |
-| Change zsh colors | `modules/home/colors.nix` | Catppuccin Mocha palette (hex values) |
+| Change zsh colors | `modules/home/colors.nix` | Tokyo Night (Storm) palette (hex values) |
 | Add a home-manager program | `modules/home/programs.nix` | direnv, htop, etc. |
+| Add an npm global (e.g. command-code) | `modules/home/npm-globals.nix` | `home.activation` scripts run on every rebuild |
 | Change git config (shared) | `git/.gitconfig` | Shared settings, personal overrides in `~/.gitconfig.local` |
 | Change Neovim config | `.config/nvim/` | LazyVim — plugins, keymaps, options, autocmds |
 | Change SSH config | `ssh_keys/config` | SSH host definitions |
-| Change Starship prompt | `.config/starship.toml` | Prompt theme and modules |
+| Change spaceship prompt config | `modules/zshrc.template` | `SPACESHIP_*` variables, near the bottom |
 | Change Ghostty config | `.config/ghostty/config` | Terminal colors, fonts, keybinds |
 | Change Aerospace config | `.config/aerospace/aerospace.toml` | Tiling rules, layouts, gaps |
 | Encrypt a new SSH key | Submit `ssh_keys/*.enc` to git | Use `sops -e -i ssh_keys/id_key` |
@@ -156,7 +159,8 @@ flake.nix                          # "the flake" — pins inputs, exports darwin
             └─ home/default.nix    # "trunk for user": imports home sub-modules
                  ├─ home/files.nix # "branch": dotfile symlinks
                  ├─ home/zsh.nix   # "branch": .zshrc generation (replaceVars + colors)
-                 └─ home/programs.nix # "branch": direnv, htop, etc.
+                 ├─ home/programs.nix # "branch": direnv, htop, etc.
+                 └─ home/npm-globals.nix # "branch": npm-installed CLIs (command-code)
 ```
 
 ### Why this matters
@@ -272,13 +276,13 @@ nix-for-mac/
     └── home/
         ├── default.nix           # home-manager entry point (imports files, zsh, programs)
         ├── files.nix             # dotfile symlinks + sessionPath
-        ├── zsh.nix               # generates .zshrc from template + colors
+        ├── zsh.nix               # generates .zshrc from template + colors + spaceship-prompt
         ├── programs.nix          # home-manager program modules (direnv, htop)
-        └── colors.nix            # Catppuccin Mocha palette (imported by zsh.nix)
+        ├── npm-globals.nix       # npm global installs (command-code) via home.activation
+        └── colors.nix            # Tokyo Night (Storm) palette (imported by zsh.nix)
 
 ../ (repo root)
 ├── .config/                      # dotfiles symlinked into ~/.config/
-│   ├── starship.toml
 │   ├── ghostty/config
 │   ├── aerospace/aerospace.toml
 │   └── nvim/                     # LazyVim config
@@ -310,7 +314,7 @@ nix-darwin manages system-level state (launchd services, /Applications symlinks,
 
 ### Can I still use Ansible for Linux servers?
 
-Yes. `~/dots/ansible/` is untouched. The `macansible` and `linuxansible` aliases in `.zshrc` still work.
+Yes — `~/dots/ansible/` targets Linux only now (`playbooks/linux.yml`); the old `mac.yml`/`public-mac.yml` playbooks were removed since Nix fully replaced them. The `linuxansible` alias in `.zshrc` still works.
 
 ### Why `--impure`?
 
@@ -318,7 +322,7 @@ The flake reads `$NIX_USER` and `$NIX_HOST` from the environment. This lets anyo
 
 ### What if I installed something with Homebrew manually?
 
-nix-darwin's homebrew module only manages what's listed in `homebrew.nix`. Anything you `brew install` by hand is left alone.
+It will get removed. `homebrew.onActivation.cleanup = "zap"` in `homebrew.nix` means every rebuild uninstalls (and zaps app data for) any brew formula/cask that isn't declared in `homebrew.nix`. This is intentional — it keeps Homebrew fully declarative, matching Nix's own philosophy — but it means anything you want to keep across rebuilds has to be added to `homebrew.nix`, not installed ad hoc. `.config/Brewfile` is a separate, unwired file (a manual reference/checklist you can run `brew bundle` against yourself) — it is not read by anything automatically and does not protect its contents from cleanup.
 
 ### The bootstrap says "SSH key decryption skipped" — is that bad?
 

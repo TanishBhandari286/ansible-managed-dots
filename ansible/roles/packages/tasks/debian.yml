@@ -12,10 +12,13 @@
     nvim_arch: "{{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else 'x86_64' }}"
     eza_arch: "{{ 'aarch64' if ansible_facts['architecture'] == 'aarch64' else 'x86_64' }}"
     lazydocker_arch: "{{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else 'x86_64' }}"
+    omp_arch: "{{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else 'x64' }}"
 
-- name: Install software-properties-common (for add-apt-repository)
+- name: Install software-properties-common and python3-debian (for deb822_repository)
   ansible.builtin.apt:
-    name: software-properties-common
+    name:
+      - software-properties-common
+      - python3-debian
     state: present
   become: true
   tags: [python, python314]
@@ -53,10 +56,9 @@
   when: ansible_facts['os_family'] == "Debian"
   tags: [python, python314]
 
-- name: Update apt cache
+- name: Update apt cache after adding deadsnakes PPA
   ansible.builtin.apt:
     update_cache: yes
-    cache_valid_time: 3600
   become: true
   when: ansible_facts['os_family'] == "Debian"
   tags: [python, python314]
@@ -79,14 +81,25 @@
   changed_when: false
   tags: [nvim, neovim]
 
-- name: Download latest Neovim AppImage
-  ansible.builtin.get_url:
-    url: https://github.com/neovim/neovim/releases/latest/download/nvim-linux-{{ nvim_arch }}.appimage
-    dest: /usr/local/bin/nvim
-    mode: "0755"
-    force: true
+- name: Get latest Neovim release tag from GitHub
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/neovim/neovim/releases/latest
+    return_content: true
+    headers:
+      Accept: "application/vnd.github+json"
+  register: nvim_release
+  tags: [nvim, neovim]
+
+- name: Download and install latest Neovim (tarball — AppImages need FUSE, which most VPS/containers lack)
+  ansible.builtin.shell: |
+    set -euo pipefail
+    curl -fsSL "https://github.com/neovim/neovim/releases/download/{{ nvim_release.json.tag_name }}/nvim-linux-{{ nvim_arch }}.tar.gz" -o /tmp/nvim.tar.gz
+    tar -C /usr/local -xzf /tmp/nvim.tar.gz --strip-components=1
+    rm -f /tmp/nvim.tar.gz
+  args:
+    executable: /bin/bash
   become: true
-  when: nvim_current_version.rc != 0
+  when: nvim_current_version.rc != 0 or nvim_release.json.tag_name not in nvim_current_version.stdout
   tags: [nvim, neovim]
 
 - name: Check if eza is already installed and get version
@@ -224,17 +237,219 @@
   when: zoxide_check.rc != 0
   tags: [zoxide]
 
-- name: Check if starship is already installed
-  ansible.builtin.command: starship --version
-  register: starship_check
+- name: Ensure spaceship-prompt is present at latest
+  ansible.builtin.git:
+    repo: https://github.com/spaceship-prompt/spaceship-prompt.git
+    dest: /usr/local/share/spaceship-prompt
+    version: master
+    update: true
+    force: true
+  become: true
+  tags: [spaceship]
+
+- name: Check if ripgrep is already installed and get version
+  ansible.builtin.command: rg --version
+  register: rg_current_version
   failed_when: false
   changed_when: false
-  tags: [starship]
+  tags: [ripgrep]
 
-- name: Install starship prompt via official installer
+- name: Get latest ripgrep release tag from GitHub
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/BurntSushi/ripgrep/releases/latest
+    return_content: true
+    headers:
+      Accept: "application/vnd.github+json"
+  register: rg_release
+  tags: [ripgrep]
+
+- name: Set ripgrep version fact
+  ansible.builtin.set_fact:
+    rg_version: "{{ rg_release.json.tag_name | regex_replace('^v', '') }}"
+  tags: [ripgrep]
+
+- name: Download and install latest ripgrep
   ansible.builtin.shell: |
-    curl -sSfL https://starship.rs/install.sh | sh -s -- --yes
+    set -euo pipefail
+    tag="{{ rg_release.json.tag_name }}"
+    asset="ripgrep-${tag}-{{ 'aarch64-unknown-linux-gnu' if ansible_facts['architecture'] == 'aarch64' else 'x86_64-unknown-linux-musl' }}"
+    curl -fsSL "https://github.com/BurntSushi/ripgrep/releases/download/${tag}/${asset}.tar.gz" -o /tmp/ripgrep.tar.gz
+    rm -rf /tmp/ripgrep-extract && mkdir -p /tmp/ripgrep-extract
+    tar -xzf /tmp/ripgrep.tar.gz -C /tmp/ripgrep-extract --strip-components=1
+    install -m 0755 /tmp/ripgrep-extract/rg /usr/local/bin/rg
+    rm -rf /tmp/ripgrep.tar.gz /tmp/ripgrep-extract
+  args:
+    executable: /bin/bash
   become: true
-  when: starship_check.rc != 0
-  tags: [starship]
+  when: rg_current_version.rc != 0 or rg_version not in rg_current_version.stdout
+  tags: [ripgrep]
+
+- name: Check if fd is already installed and get version
+  ansible.builtin.command: fd --version
+  register: fd_current_version
+  failed_when: false
+  changed_when: false
+  tags: [fd]
+
+- name: Get latest fd release tag from GitHub
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/sharkdp/fd/releases/latest
+    return_content: true
+    headers:
+      Accept: "application/vnd.github+json"
+  register: fd_release
+  tags: [fd]
+
+- name: Set fd version fact
+  ansible.builtin.set_fact:
+    fd_version: "{{ fd_release.json.tag_name | regex_replace('^v', '') }}"
+  tags: [fd]
+
+- name: Download and install latest fd
+  ansible.builtin.shell: |
+    set -euo pipefail
+    tag="{{ fd_release.json.tag_name }}"
+    asset="fd-${tag}-{{ 'aarch64-unknown-linux-gnu' if ansible_facts['architecture'] == 'aarch64' else 'x86_64-unknown-linux-musl' }}"
+    curl -fsSL "https://github.com/sharkdp/fd/releases/download/${tag}/${asset}.tar.gz" -o /tmp/fd.tar.gz
+    rm -rf /tmp/fd-extract && mkdir -p /tmp/fd-extract
+    tar -xzf /tmp/fd.tar.gz -C /tmp/fd-extract --strip-components=1
+    install -m 0755 /tmp/fd-extract/fd /usr/local/bin/fd
+    rm -rf /tmp/fd.tar.gz /tmp/fd-extract
+  args:
+    executable: /bin/bash
+  become: true
+  when: fd_current_version.rc != 0 or fd_version not in fd_current_version.stdout
+  tags: [fd]
+
+- name: Check if bat is already installed and get version
+  ansible.builtin.command: bat --version
+  register: bat_current_version
+  failed_when: false
+  changed_when: false
+  tags: [bat]
+
+- name: Get latest bat release tag from GitHub
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/sharkdp/bat/releases/latest
+    return_content: true
+    headers:
+      Accept: "application/vnd.github+json"
+  register: bat_release
+  tags: [bat]
+
+- name: Set bat version fact
+  ansible.builtin.set_fact:
+    bat_version: "{{ bat_release.json.tag_name | regex_replace('^v', '') }}"
+  tags: [bat]
+
+- name: Download and install latest bat
+  ansible.builtin.shell: |
+    set -euo pipefail
+    tag="{{ bat_release.json.tag_name }}"
+    asset="bat-${tag}-{{ 'aarch64-unknown-linux-gnu' if ansible_facts['architecture'] == 'aarch64' else 'x86_64-unknown-linux-musl' }}"
+    curl -fsSL "https://github.com/sharkdp/bat/releases/download/${tag}/${asset}.tar.gz" -o /tmp/bat.tar.gz
+    rm -rf /tmp/bat-extract && mkdir -p /tmp/bat-extract
+    tar -xzf /tmp/bat.tar.gz -C /tmp/bat-extract --strip-components=1
+    install -m 0755 /tmp/bat-extract/bat /usr/local/bin/bat
+    rm -rf /tmp/bat.tar.gz /tmp/bat-extract
+  args:
+    executable: /bin/bash
+  become: true
+  when: bat_current_version.rc != 0 or bat_version not in bat_current_version.stdout
+  tags: [bat]
+
+- name: Clone/update fzf to latest and run its installer
+  ansible.builtin.shell: |
+    set -euo pipefail
+    if [ -d "{{ user_home }}/.fzf" ]; then
+      git -C "{{ user_home }}/.fzf" pull --ff-only
+    else
+      git clone https://github.com/junegunn/fzf.git "{{ user_home }}/.fzf"
+    fi
+    "{{ user_home }}/.fzf/install" --completion --key-bindings --no-update-rc
+  args:
+    executable: /bin/bash
+  environment:
+    HOME: "{{ user_home }}"
+  become: false
+  tags: [fzf]
+
+- name: Symlink fzf binary onto PATH
+  ansible.builtin.file:
+    src: "{{ user_home }}/.fzf/bin/fzf"
+    dest: /usr/local/bin/fzf
+    state: link
+    force: true
+  become: true
+  tags: [fzf]
+
+- name: Ensure zsh-syntax-highlighting is present at latest
+  ansible.builtin.git:
+    repo: https://github.com/zsh-users/zsh-syntax-highlighting.git
+    dest: /usr/local/share/zsh-syntax-highlighting
+    version: master
+    update: true
+    force: true
+  become: true
+  tags: [zsh_plugins]
+
+- name: Ensure zsh-autosuggestions is present at latest
+  ansible.builtin.git:
+    repo: https://github.com/zsh-users/zsh-autosuggestions.git
+    dest: /usr/local/share/zsh-autosuggestions
+    version: master
+    update: true
+    force: true
+  become: true
+  tags: [zsh_plugins]
+
+- name: Check if mise is already installed
+  ansible.builtin.command: "{{ user_home }}/.local/bin/mise --version"
+  register: mise_check
+  failed_when: false
+  changed_when: false
+  tags: [mise]
+
+- name: Install mise via official installer
+  ansible.builtin.shell: |
+    curl -fsSL https://mise.run | sh
+  args:
+    executable: /bin/bash
+  environment:
+    HOME: "{{ user_home }}"
+  become: false
+  when: mise_check.rc != 0
+  tags: [mise]
+
+- name: Check if omp is already installed and get version
+  ansible.builtin.command: omp --version
+  register: omp_current_version
+  failed_when: false
+  changed_when: false
+  tags: [omp]
+
+- name: Get latest omp (oh-my-pi) release tag from GitHub
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/can1357/oh-my-pi/releases/latest
+    return_content: true
+    headers:
+      Accept: "application/vnd.github+json"
+  register: omp_release
+  tags: [omp]
+
+- name: Set omp version fact
+  ansible.builtin.set_fact:
+    omp_version: "{{ omp_release.json.tag_name | regex_replace('^v', '') }}"
+  tags: [omp]
+
+- name: Download and install latest omp (coding agent)
+  ansible.builtin.shell: |
+    set -euo pipefail
+    curl -fsSL "https://github.com/can1357/oh-my-pi/releases/download/{{ omp_release.json.tag_name }}/omp-linux-{{ omp_arch }}" -o /usr/local/bin/omp
+    chmod 0755 /usr/local/bin/omp
+  args:
+    executable: /bin/bash
+  become: true
+  when: omp_current_version.rc != 0 or omp_version not in omp_current_version.stdout
+  tags: [omp]
 

@@ -16,11 +16,10 @@
     ];
 
     brews = [
-      "can1357/tap/omp"
-      "tw93/tap/mole"
       "sshs"
       "portal"
       "omp"
+      "mole"
     ];
 
     casks = [
@@ -29,6 +28,7 @@
       "aerospace"
       "antigravity"
       "brave-browser"
+      "claude-code"
       "font-jetbrains-mono"
       "gcloud-cli"
       "iina"

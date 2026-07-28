@@ -117,6 +117,7 @@ cask "visual-studio-code"
 cask "whatsapp"
 # Multiplayer code editor
 cask "zap"
+cask "claude-code"
 cask "zed"
 vscode "commandcode.commandcode-vscode"
 vscode "formulahendry.code-runner"

@@ -67,38 +67,19 @@ link() {
 
 mkdir -p "$HOME/.config"
 
-case "$OS" in
+# macOS is provisioned by nix-for-mac (nix-darwin + home-manager) instead —
+# see nix-for-mac/bootstrap.sh. This script only runs via the Linux ansible
+# dotfiles role.
+if [[ "$OS" != "Linux" ]]; then
+  printf 'Unsupported OS: %s (macOS uses nix-for-mac/bootstrap.sh instead)\n' "$OS" >&2
+  exit 1
+fi
 
-  # ---------------------------------------------------------------------------
-  Darwin)
-    echo ""
-    echo "── macOS ────────────────────────────────────────────────────────────────"
-    link "$DOTS_DIR/.zshrc"                 "$HOME/.zshrc"
-    link "$DOTS_DIR/git/.gitconfig"         "$HOME/.gitconfig"
-    link "$DOTS_DIR/.config/nvim"           "$HOME/.config/nvim"
-    link "$DOTS_DIR/.config/aerospace"      "$HOME/.config/aerospace"
-    link "$DOTS_DIR/.config/ghostty"        "$HOME/.config/ghostty"
-    link "$DOTS_DIR/.config/starship.toml"  "$HOME/.config/starship.toml"
-    # Signing key + gpgsign — loaded via [include] path = ~/.gitconfig.local
-    link "$DOTS_DIR/git/.gitconfig.mac"     "$HOME/.gitconfig.local"
-    ;;
-
-  # ---------------------------------------------------------------------------
-  Linux)
-    echo ""
-    echo "── Linux ────────────────────────────────────────────────────────────────"
-    link "$DOTS_DIR/.zshrc"                 "$HOME/.zshrc"
-    link "$DOTS_DIR/git/.gitconfig"         "$HOME/.gitconfig"
-    link "$DOTS_DIR/.config/nvim"           "$HOME/.config/nvim"
-    ;;
-
-  # ---------------------------------------------------------------------------
-  *)
-    printf 'Unsupported OS: %s\n' "$OS" >&2
-    exit 1
-    ;;
-
-esac
+echo ""
+echo "── Linux ────────────────────────────────────────────────────────────────"
+link "$DOTS_DIR/.zshrc"                 "$HOME/.zshrc"
+link "$DOTS_DIR/git/.gitconfig"         "$HOME/.gitconfig"
+link "$DOTS_DIR/.config/nvim"           "$HOME/.config/nvim"
 
 echo ""
 echo "Done. Run 'exec zsh' to reload your shell."

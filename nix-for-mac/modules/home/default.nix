@@ -5,6 +5,7 @@
     ./files.nix
     ./zsh.nix
     ./programs.nix
+    ./npm-globals.nix
   ];
 
   home.stateVersion = "24.11";

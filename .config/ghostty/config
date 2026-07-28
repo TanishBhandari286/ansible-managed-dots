@@ -1,7 +1,7 @@
 # ~/.config/ghostty/config
 
 # Theme
-theme = Rose Pine
+theme = TokyoNight Storm
 term = xterm-256color
 
 # Font (Change to your preferred Nerd Font)

@@ -10,7 +10,6 @@
     zsh-autosuggestions
     zsh-syntax-highlighting
     tmux
-    starship
 
     # — Core CLI replacements
     bat                                # cat with syntax highlighting

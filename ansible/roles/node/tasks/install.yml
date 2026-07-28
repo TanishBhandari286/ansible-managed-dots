@@ -1,30 +1,65 @@
 ---
 
-- name: Install curl (required to fetch NodeSource setup script)
+- name: Install curl and git (required by nvm)
   ansible.builtin.apt:
-    name: curl
+    name:
+      - curl
+      - git
     state: present
     update_cache: false
   become: true
 
-- name: Check if NodeSource 20.x repo is already configured
+- name: Check if nvm is already installed
   ansible.builtin.stat:
-    path: /etc/apt/sources.list.d/nodesource.list
-  register: nodesource_list
+    path: "{{ user_home }}/.nvm/nvm.sh"
+  register: nvm_script
 
-- name: Run NodeSource setup script to add repository
+- name: Install nvm
   ansible.builtin.shell:
-    cmd: curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+    cmd: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+    creates: "{{ user_home }}/.nvm/nvm.sh"
   become: true
-  args:
-    creates: /etc/apt/sources.list.d/nodesource.sources
+  become_user: "{{ ansible_user }}"
+  when: not nvm_script.stat.exists
 
-- name: Install Node.js 20 LTS
-  ansible.builtin.apt:
-    name: nodejs
-    state: present
-    update_cache: false
+- name: Install Node.js 22 LTS via nvm
+  ansible.builtin.shell:
+    executable: /bin/bash
+    cmd: |
+      export NVM_DIR="$HOME/.nvm"
+      [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+      nvm install 22
+      nvm alias default 22
+    creates: "{{ user_home }}/.nvm/versions/node"
+  environment:
+    HOME: "{{ user_home }}"
   become: true
+  become_user: "{{ ansible_user }}"
+
+- name: Upgrade npm to latest
+  ansible.builtin.shell:
+    executable: /bin/bash
+    cmd: |
+      export NVM_DIR="$HOME/.nvm"
+      [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+      npm install -g npm@latest
+  environment:
+    HOME: "{{ user_home }}"
+  become: true
+  become_user: "{{ ansible_user }}"
+
+- name: Install/update command-code (coding agent) via npm
+  ansible.builtin.shell:
+    executable: /bin/bash
+    cmd: |
+      export NVM_DIR="$HOME/.nvm"
+      [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+      npm install -g command-code@latest
+  environment:
+    HOME: "{{ user_home }}"
+  become: true
+  become_user: "{{ ansible_user }}"
+  tags: [command-code]
 
 - name: Install build-essential
   ansible.builtin.apt:

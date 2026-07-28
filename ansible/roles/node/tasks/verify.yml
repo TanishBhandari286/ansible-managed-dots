@@ -1,23 +1,38 @@
 ---
 
-- name: Get node version
-  ansible.builtin.command: node --version
+- name: Get node version via nvm
+  ansible.builtin.shell:
+    executable: /bin/bash
+    cmd: |
+      export NVM_DIR="$HOME/.nvm"
+      [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+      node --version
   register: node_version
   changed_when: false
-  become: false
+  become: true
+  become_user: "{{ ansible_user }}"
+  environment:
+    HOME: "{{ user_home }}"
 
-- name: Get npm version
-  ansible.builtin.command: npm --version
+- name: Get npm version via nvm
+  ansible.builtin.shell:
+    executable: /bin/bash
+    cmd: |
+      export NVM_DIR="$HOME/.nvm"
+      [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+      npm --version
   register: npm_version
   changed_when: false
-  become: false
+  become: true
+  become_user: "{{ ansible_user }}"
+  environment:
+    HOME: "{{ user_home }}"
 
-- name: Verify node is 20.x
+- name: Verify node is 22.x
   ansible.builtin.assert:
-    that: node_version.stdout is match('^v20\.')
+    that: node_version.stdout is match('^v22\.')
     fail_msg: >
-      Expected Node.js 20.x but got {{ node_version.stdout }}.
-      Check that the NodeSource 20.x repo was added correctly.
+      Expected Node.js 22.x but got {{ node_version.stdout }}.
     success_msg: "Node.js {{ node_version.stdout }} — OK"
 
 - name: Print Node.js and npm versions

@@ -1,21 +1,21 @@
 # ── colors.nix ─────────────────────────────────────────────────────────
-# Catppuccin Mocha color palette — pure data, imported where needed.
+# Tokyo Night (Storm) color palette — pure data, imported where needed.
+# Matches the Ghostty "TokyoNight Storm" theme for a consistent look.
 {
-  mocha = {
-    rosewater = "#f5e0dc";
-    pink = "#f5c2e7";
-    mauve = "#cba6f7";
-    red = "#f38ba8";
-    peach = "#fab387";
-    yellow = "#f9e2af";
-    green = "#a6e3a1";
-    sky = "#89dceb";
-    blue = "#89b4fa";
-    lavender = "#b4befe";
-    text = "#cdd6f4";
-    surface2 = "#585b70";
-    surface1 = "#45475a";
-    surface0 = "#313244";
-    base = "#1e1e2e";
+  tokyonight = {
+    bg = "#24283b";
+    bg_highlight = "#292e42";
+    fg = "#c0caf5";
+    comment = "#565f89";
+    blue = "#7aa2f7";
+    cyan = "#7dcfff";
+    magenta = "#bb9af7";
+    magenta2 = "#ff007c";
+    purple = "#9d7cd8";
+    orange = "#ff9e64";
+    yellow = "#e0af68";
+    green = "#9ece6a";
+    teal = "#1abc9c";
+    red = "#f7768e";
   };
 }

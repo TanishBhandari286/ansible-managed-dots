@@ -2,13 +2,12 @@
 # .zshrc — Feature-rich Zsh configuration
 # Managed by Ansible — edit at: dots/.zshrc
 # =============================================================================
-# Supports: macOS (Homebrew) + Linux (apt / manual installs)
-# Theme:    Catppuccin Mocha (FZF) + Rosé Pine (Starship prompt)
+# Platform: Linux only (macOS is provisioned by nix-for-mac instead — see
+#           nix-for-mac/modules/zshrc.template for the Mac equivalent)
+# Theme:    Tokyo Night (Storm) — matches the Ghostty "TokyoNight Storm" theme
+# Prompt:   spaceship-prompt
 # Features: fzf completions, syntax highlighting, autosuggestions, zoxide, eza
 # =============================================================================
-
-# ---- OS Detection -----------------------------------------------------------
-export ZSH_OS="$(uname -s)"   # Darwin | Linux
 
 # ---- Performance: only run compinit once per day ---------------------------
 autoload -Uz compinit
@@ -32,25 +31,18 @@ setopt INC_APPEND_HISTORY      # Write to history file immediately
 
 # ---- Path -------------------------------------------------------------------
 typeset -U path                # Ensure unique entries in $PATH
-
-# macOS Homebrew (Apple Silicon)
-[[ -f /opt/homebrew/bin/brew ]] && eval "$(/opt/homebrew/bin/brew shellenv)"
-# macOS Homebrew (Intel)
-[[ -f /usr/local/bin/brew ]] && eval "$(/usr/local/bin/brew shellenv)"
-
-# User-local binaries (zoxide, cargo, pipx, etc.)
 path=("$HOME/.local/bin" "$HOME/bin" "$HOME/.cargo/bin" $path)
 
-# ---- Completion styling -----------------------------------------------------
+# ---- Completion styling (Tokyo Night) ----------------------------------------
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 zstyle ':completion:*' special-dirs true
 zstyle ':completion:*' squeeze-slashes true
-zstyle ':completion:*:descriptions' format '%F{#cba6f7}── %d ──%f'
-zstyle ':completion:*:warnings' format '%F{#f38ba8}No matches for: %d%f'
-zstyle ':completion:*:messages' format '%F{#a6e3a1}%d%f'
-zstyle ':completion:*:corrections' format '%F{#fab387}%d (errors: %e)%f'
+zstyle ':completion:*:descriptions' format '%F{#9d7cd8}── %d ──%f'
+zstyle ':completion:*:warnings' format '%F{#f7768e}No matches for: %d%f'
+zstyle ':completion:*:messages' format '%F{#9ece6a}%d%f'
+zstyle ':completion:*:corrections' format '%F{#ff9e64}%d (errors: %e)%f'
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*' rehash true
 
@@ -71,12 +63,12 @@ bindkey '^[[H' beginning-of-line         # Home
 bindkey '^[[F' end-of-line               # End
 
 # ---- FZF --------------------------------------------------------------------
-# Catppuccin Mocha color palette for fzf
+# Tokyo Night (Storm) color palette for fzf
 export FZF_DEFAULT_OPTS="
-  --color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8
-  --color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc
-  --color=marker:#b4befe,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8
-  --color=selected-bg:#45475a
+  --color=bg+:#292e42,bg:#24283b,spinner:#7dcfff,hl:#f7768e
+  --color=fg:#c0caf5,header:#f7768e,info:#9d7cd8,pointer:#7dcfff
+  --color=marker:#7aa2f7,fg+:#c0caf5,prompt:#9d7cd8,hl+:#f7768e
+  --color=selected-bg:#292e42
   --height=50%
   --layout=reverse
   --border=rounded
@@ -91,15 +83,10 @@ export FZF_DEFAULT_OPTS="
 "
 
 # Use fd for fzf file finding (respects .gitignore, faster)
-# Ubuntu installs fd as fdfind
 if command -v fd &>/dev/null; then
   export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
   export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
   export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
-elif command -v fdfind &>/dev/null; then
-  export FZF_DEFAULT_COMMAND='fdfind --type f --hidden --follow --exclude .git'
-  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-  export FZF_ALT_C_COMMAND='fdfind --type d --hidden --follow --exclude .git'
 fi
 
 # fzf file preview with bat
@@ -130,67 +117,42 @@ export FZF_CTRL_R_OPTS="
   --header 'CTRL-Y: copy  CTRL-/: toggle preview'
 "
 
-# Source fzf shell integrations (key bindings + completions)
-if [[ "$ZSH_OS" == "Darwin" ]]; then
-  # Homebrew fzf
-  if [[ -f "$(brew --prefix)/opt/fzf/shell/key-bindings.zsh" ]]; then
-    source "$(brew --prefix)/opt/fzf/shell/key-bindings.zsh"
-  fi
-  if [[ -f "$(brew --prefix)/opt/fzf/shell/completion.zsh" ]]; then
-    source "$(brew --prefix)/opt/fzf/shell/completion.zsh"
-  fi
-elif [[ "$ZSH_OS" == "Linux" ]]; then
-  # apt fzf puts bindings here; fallback to ~/.fzf.zsh (git install)
-  if [[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]]; then
-    source /usr/share/doc/fzf/examples/key-bindings.zsh
-  elif [[ -f "$HOME/.fzf.zsh" ]]; then
-    source "$HOME/.fzf.zsh"
-  fi
-  if [[ -f /usr/share/doc/fzf/examples/completion.zsh ]]; then
-    source /usr/share/doc/fzf/examples/completion.zsh
-  fi
-fi
+# fzf is installed via its own git checkout + installer (~/.fzf), which
+# writes key-bindings + completion into a single ~/.fzf.zsh
+[[ -f "$HOME/.fzf.zsh" ]] && source "$HOME/.fzf.zsh"
 
 # ---- Zsh Syntax Highlighting -----------------------------------------------
 # Must be sourced BEFORE zsh-autosuggestions for correct color stacking
-if [[ "$ZSH_OS" == "Darwin" ]]; then
-  ZSH_HL="$(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-elif [[ "$ZSH_OS" == "Linux" ]]; then
-  ZSH_HL="/usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-fi
+ZSH_HL="/usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 [[ -f "$ZSH_HL" ]] && source "$ZSH_HL"
 
-# Syntax highlighting color overrides (Catppuccin Mocha)
+# Syntax highlighting color overrides (Tokyo Night Storm)
 typeset -A ZSH_HIGHLIGHT_STYLES
-ZSH_HIGHLIGHT_STYLES[command]='fg=#a6e3a1,bold'
-ZSH_HIGHLIGHT_STYLES[alias]='fg=#a6e3a1,bold'
-ZSH_HIGHLIGHT_STYLES[builtin]='fg=#89b4fa,bold'
-ZSH_HIGHLIGHT_STYLES[function]='fg=#cba6f7,bold'
-ZSH_HIGHLIGHT_STYLES[precommand]='fg=#fab387,bold'
-ZSH_HIGHLIGHT_STYLES[commandseparator]='fg=#f38ba8'
-ZSH_HIGHLIGHT_STYLES[redirection]='fg=#f5c2e7'
-ZSH_HIGHLIGHT_STYLES[arg0]='fg=#a6e3a1'
-ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=#a6e3a1'
-ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=#a6e3a1'
-ZSH_HIGHLIGHT_STYLES[dollar-quoted-argument]='fg=#fab387'
-ZSH_HIGHLIGHT_STYLES[back-quoted-argument]='fg=#cba6f7'
-ZSH_HIGHLIGHT_STYLES[path]='fg=#89dceb,underline'
-ZSH_HIGHLIGHT_STYLES[path_prefix]='fg=#89dceb'
-ZSH_HIGHLIGHT_STYLES[globbing]='fg=#f9e2af'
-ZSH_HIGHLIGHT_STYLES[history-expansion]='fg=#cba6f7'
-ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=#f38ba8,bold'
-ZSH_HIGHLIGHT_STYLES[reserved-word]='fg=#89b4fa'
+ZSH_HIGHLIGHT_STYLES[command]='fg=#9ece6a,bold'
+ZSH_HIGHLIGHT_STYLES[alias]='fg=#9ece6a,bold'
+ZSH_HIGHLIGHT_STYLES[builtin]='fg=#7aa2f7,bold'
+ZSH_HIGHLIGHT_STYLES[function]='fg=#9d7cd8,bold'
+ZSH_HIGHLIGHT_STYLES[precommand]='fg=#ff9e64,bold'
+ZSH_HIGHLIGHT_STYLES[commandseparator]='fg=#f7768e'
+ZSH_HIGHLIGHT_STYLES[redirection]='fg=#ff007c'
+ZSH_HIGHLIGHT_STYLES[arg0]='fg=#9ece6a'
+ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=#9ece6a'
+ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=#9ece6a'
+ZSH_HIGHLIGHT_STYLES[dollar-quoted-argument]='fg=#ff9e64'
+ZSH_HIGHLIGHT_STYLES[back-quoted-argument]='fg=#9d7cd8'
+ZSH_HIGHLIGHT_STYLES[path]='fg=#7dcfff,underline'
+ZSH_HIGHLIGHT_STYLES[path_prefix]='fg=#7dcfff'
+ZSH_HIGHLIGHT_STYLES[globbing]='fg=#e0af68'
+ZSH_HIGHLIGHT_STYLES[history-expansion]='fg=#bb9af7'
+ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=#f7768e,bold'
+ZSH_HIGHLIGHT_STYLES[reserved-word]='fg=#7aa2f7'
 
 # ---- Zsh Autosuggestions ----------------------------------------------------
-if [[ "$ZSH_OS" == "Darwin" ]]; then
-  ZSH_AS="$(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
-elif [[ "$ZSH_OS" == "Linux" ]]; then
-  ZSH_AS="/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
-fi
+ZSH_AS="/usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
 [[ -f "$ZSH_AS" ]] && source "$ZSH_AS"
 
 # Autosuggestion styling
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#585b70,italic'   # Catppuccin surface2 (subtle ghost)
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#565f89,italic'   # Tokyo Night "comment" (subtle ghost)
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)          # history first, then completions
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=50
 ZSH_AUTOSUGGEST_USE_ASYNC=true
@@ -222,9 +184,6 @@ fi
 # ---- Bat (better cat) -------------------------------------------------------
 if command -v bat &>/dev/null; then
   alias cat='bat --style=plain --paging=never'                                 # bat with full styling
-elif command -v batcat &>/dev/null; then
-  alias cat='batcat --style=plain --paging=never'
-  alias bcat='batcat'                            
 fi
 
 # ---- Git shortcuts ----------------------------------------------------------
@@ -258,7 +217,6 @@ alias ...='cd ../..'
 alias ....='cd ../../..'
 alias path='echo -e ${PATH//:/\\n}'     # Pretty-print PATH entries
 alias reload='exec zsh'                  # Reload this config
-alias macansible='(cd ~/dots/ansible && ansible-playbook playbooks/mac.yml)'
 alias linuxansible='(cd ~/dots/ansible && ansible-playbook playbooks/linux.yml)'
 
 # ---- Editor -----------------------------------------------------------------
@@ -276,19 +234,58 @@ fi
 # Node / npm global bins
 [[ -d "$HOME/.npm-global/bin" ]] && path=("$HOME/.npm-global/bin" $path)
 
+# nvm (Node is managed via nvm on Linux)
+export NVM_DIR="$HOME/.nvm"
+[[ -s "$NVM_DIR/nvm.sh" ]] && \. "$NVM_DIR/nvm.sh"
+[[ -s "$NVM_DIR/bash_completion" ]] && \. "$NVM_DIR/bash_completion"
+
 # Cargo (Rust)
 [[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
 
-# ---- Starship prompt --------------------------------------------------------
-# Starship is installed via Brewfile (macOS) or cargo/script (Linux)
-if command -v starship &>/dev/null; then
-  export STARSHIP_CONFIG="$HOME/.config/starship.toml"
-  eval "$(starship init zsh)"
-fi
+# ---- Mise (polyglot runtime manager) ----------------------------------------
+command -v mise &>/dev/null && eval "$(mise activate zsh)"
+
+# ---- OMP (oh-my-pi coding agent) completions --------------------------------
+command -v omp &>/dev/null && eval "$(omp completions zsh)"
+
+# ---- Spaceship prompt (Tokyo Night colors) ----------------------------------
+SPACESHIP_PROMPT_ORDER=(
+  user
+  dir
+  host
+  git
+  node
+  python
+  docker
+  docker_compose
+  kubectl
+  exec_time
+  line_sep
+  jobs
+  exit_code
+  sudo
+  char
+)
+SPACESHIP_PROMPT_ADD_NEWLINE=true
+SPACESHIP_PROMPT_SEPARATE_LINE=true
+SPACESHIP_CHAR_SYMBOL='❯'
+SPACESHIP_CHAR_COLOR_SUCCESS='#9ece6a'
+SPACESHIP_CHAR_COLOR_FAILURE='#f7768e'
+SPACESHIP_USER_SHOW='needed'
+SPACESHIP_HOST_SHOW='ssh'
+SPACESHIP_DIR_COLOR='#7aa2f7'
+SPACESHIP_GIT_BRANCH_COLOR='#9d7cd8'
+SPACESHIP_GIT_STATUS_COLOR='#ff9e64'
+SPACESHIP_NODE_COLOR='#9ece6a'
+SPACESHIP_PYTHON_COLOR='#7dcfff'
+SPACESHIP_DOCKER_COLOR='#7aa2f7'
+SPACESHIP_KUBECTL_CONTEXT_COLOR='#1abc9c'
+SPACESHIP_EXEC_TIME_COLOR='#e0af68'
+SPACESHIP_EXIT_CODE_SHOW=true
+SPACESHIP_EXIT_CODE_COLOR='#f7768e'
+[[ -f "/usr/local/share/spaceship-prompt/spaceship.zsh" ]] && source "/usr/local/share/spaceship-prompt/spaceship.zsh"
 
 # ---- Local overrides --------------------------------------------------------
 # Source a local, machine-specific file that is NOT committed to the repo.
 # Use this for secrets, API keys, or per-machine customizations.
 [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
-eval "$(mise activate zsh)"
-eval "$(omp completions zsh)"

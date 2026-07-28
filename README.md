@@ -1,54 +1,79 @@
 # dots — Personal Dotfiles & Infrastructure as Code
 
-A fully automated, Ansible-powered dotfiles repository for macOS workstations and Linux servers.
+One repo, two provisioning tools, split by platform:
+
+- **macOS** → [Nix](https://nixos.org) (`nix-darwin` + `home-manager`), fully declarative. See [`nix-for-mac/nix.md`](nix-for-mac/nix.md) for the deep dive.
+- **Linux servers/VPS** → [Ansible](https://www.ansible.com/), in [`ansible/`](ansible).
+
+macOS used to be provisioned by Ansible too — it isn't anymore. Nix owns the Mac entirely now; the Ansible side only targets Linux.
 
 ---
 
-## Public Installation (Strangers)
+## macOS
 
-If you'd like to use this setup, you can install it with a single command. This public mode will install all packages, applications, and dotfiles symlinks, but it will safely skip the private SSH keys and Ansible Vault secrets.
+One command, works whether you're the owner (SSH keys decrypt automatically) or a stranger trying the setup:
 
-**For macOS:**
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/TanishBhandari286/ansible-managed-dots/main/bootstrap-public-mac.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/TanishBhandari286/ansible-managed-dots/main/nix-for-mac/bootstrap.sh)"
 ```
 
-**For Linux:**
+Not the owner? Set your own user/host first so it doesn't try to use mine:
+
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/TanishBhandari286/ansible-managed-dots/main/bootstrap-public-linux.sh)"
+NIX_USER=alice NIX_HOST=alices-macbook bash -c "$(curl -fsSL https://raw.githubusercontent.com/TanishBhandari286/ansible-managed-dots/main/nix-for-mac/bootstrap.sh)"
 ```
 
-### What this will install:
+This installs Xcode CLI tools, Nix, Homebrew (for GUI apps Nix doesn't package), clones the repo, and builds the whole system. Update anytime with the `macupdate` shell alias.
 
-**Command Line Tools (Mac & Linux)**:
-`zsh`, `git`, `neovim`, `tmux`, `starship` (prompt), `eza` (modern `ls`), `bat` (modern `cat`), `fzf` (fuzzy finder), `ripgrep`, `fd`, `htop`, `python3`, `node.js`, `docker` (Linux only).
+## Linux (servers / VPS)
 
-**Mac Applications (Casks)**:
-`Ghostty` (terminal), `AeroSpace` (tiling window manager), `OrbStack` (Docker replacement), `VS Code`, `Obsidian`, `Raycast`, `Brave Browser`, `Proton Suite` (Mail, VPN, Drive, Pass), `Spotify`, `Stremio`, `WhatsApp`.
+**Personal use** — edit `ansible/inventory/hosts.ini` with your host(s), then:
 
-### What this will do:
-- Ask for your `sudo` password upfront to authorize installations.
-- Keep the `sudo` credential alive in the background so you are never prompted again.
-- Automatically install Xcode CLI tools, Homebrew, and Ansible (if missing).
-- Clone this repository to `~/dots`.
-- Automatically bypass the owner's Ansible Vault requirements.
-- Run the public Ansible playbook (`public-mac.yml` or `public-linux.yml`) to symlink dotfiles and install packages.
-
----
-
-## Personal Use (Owner)
-
-**For macOS (Local Setup):**
-To bootstrap a brand new Mac out of the box:
-```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/TanishBhandari286/ansible-managed-dots/main/bootstrap.sh)"
-```
-*(If already cloned and you just want to run updates, run: `cd ~/dots/ansible && ansible-playbook playbooks/mac.yml`)*
-
-**For Linux (Remote Provisioning):**
-Edit `ansible/inventory/hosts.ini` to add your server IPs, then run:
 ```bash
 cd ~/dots/ansible
 ansible-playbook -i inventory/hosts.ini playbooks/linux.yml
 ```
-*(Note: Use `-K` to prompt for sudo password if your remote user requires it for privilege escalation).*
+
+Or just run the `linuxansible` shell alias if the repo's already cloned.
+
+**Public mode** (strangers, no vault secrets) — one command:
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/TanishBhandari286/ansible-managed-dots/main/bootstrap-public-linux.sh)"
+```
+
+---
+
+## What you get
+
+| Category | Tools |
+|---|---|
+| Shell | zsh, spaceship-prompt, zsh-syntax-highlighting, zsh-autosuggestions, fzf |
+| Core replacements | eza (ls), bat (cat), fd (find), ripgrep (grep), zoxide (cd) |
+| Editor | Neovim (LazyVim) |
+| Git | git, lazygit, delta |
+| Runtimes | mise (polyglot version manager), nvm + Node (Linux) / nixpkgs Node (Mac), Python 3.14 |
+| Containers | Docker, lazydocker |
+| Coding agents | [omp](https://omp.sh) (oh-my-pi), [command-code](https://commandcode.ai) |
+| Theme | Tokyo Night (Storm) — zsh colors, fzf, and the Ghostty terminal all match |
+
+Everything with upstream releases is pulled from the **latest GitHub release**, not the OS package manager — apt's versions of things like ripgrep/fd/bat/neovim lag behind, so those are fetched directly instead. Only genuinely stable/base packages (curl, git, build-essential, etc.) come from apt on Linux; on Mac, nixpkgs plays that role and tracks upstream closely on its own.
+
+## Repo layout
+
+```
+.zshrc                   # Linux shell config (symlinked by ansible/roles/dotfiles)
+nix-for-mac/              # Everything macOS — nix-darwin + home-manager
+  bootstrap.sh            #   one-shot Mac setup script
+  modules/zshrc.template  #   Mac shell config (Nix-templated equivalent of .zshrc)
+  nix.md                  #   full reference: what's installed, how to add/remove things
+ansible/                  # Everything Linux
+  playbooks/linux.yml     #   the only playbook that matters now
+  roles/                  #   packages, node, docker, ssh, dotfiles
+.config/                  # App configs symlinked on both platforms (nvim, ghostty, ...)
+ssh_keys/                 # SSH keys, encrypted at rest with sops (age)
+```
+
+## Secrets
+
+SSH private keys live in `ssh_keys/*.enc`, encrypted with [sops](https://github.com/getsops/sops) + [age](https://github.com/FiloSottile/age). Ansible Vault handles other secrets under `ansible/group_vars/all/vault.yml`. Neither is readable without the corresponding key/password — see `nix-for-mac/nix.md` for the sops setup if you're forking this.
