@@ -8,11 +8,13 @@
     onActivation.autoUpdate = true;
     onActivation.cleanup = "zap";
 
+    # All of these are third-party taps, so Homebrew 6+'s HOMEBREW_REQUIRE_TAP_TRUST
+    # refuses to load their formulae/casks unless explicitly marked trusted here.
     taps = [
-      "nikitabobko/tap"
-      "barutsrb/tap"
-      "can1357/tap"
-      "tw93/tap"
+      { name = "nikitabobko/tap"; trusted = true; }
+      { name = "barutsrb/tap"; trusted = true; }
+      { name = "can1357/tap"; trusted = true; }
+      { name = "tw93/tap"; trusted = true; }
     ];
 
     brews = [

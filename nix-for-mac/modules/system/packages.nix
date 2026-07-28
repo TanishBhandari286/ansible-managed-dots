@@ -9,6 +9,7 @@
     zsh
     zsh-autosuggestions
     zsh-syntax-highlighting
+    starship
     tmux
 
     # — Core CLI replacements

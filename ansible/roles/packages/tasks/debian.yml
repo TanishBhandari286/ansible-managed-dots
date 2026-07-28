@@ -237,15 +237,19 @@
   when: zoxide_check.rc != 0
   tags: [zoxide]
 
-- name: Ensure spaceship-prompt is present at latest
-  ansible.builtin.git:
-    repo: https://github.com/spaceship-prompt/spaceship-prompt.git
-    dest: /usr/local/share/spaceship-prompt
-    version: master
-    update: true
-    force: true
+- name: Check if starship is already installed
+  ansible.builtin.command: starship --version
+  register: starship_check
+  failed_when: false
+  changed_when: false
+  tags: [starship]
+
+- name: Install starship prompt via official installer
+  ansible.builtin.shell: |
+    curl -sSfL https://starship.rs/install.sh | sh -s -- --yes
   become: true
-  tags: [spaceship]
+  when: starship_check.rc != 0
+  tags: [starship]
 
 - name: Check if ripgrep is already installed and get version
   ansible.builtin.command: rg --version

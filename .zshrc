@@ -5,7 +5,7 @@
 # Platform: Linux only (macOS is provisioned by nix-for-mac instead — see
 #           nix-for-mac/modules/zshrc.template for the Mac equivalent)
 # Theme:    Tokyo Night (Storm) — matches the Ghostty "TokyoNight Storm" theme
-# Prompt:   spaceship-prompt
+# Prompt:   starship
 # Features: fzf completions, syntax highlighting, autosuggestions, zoxide, eza
 # =============================================================================
 
@@ -248,42 +248,11 @@ command -v mise &>/dev/null && eval "$(mise activate zsh)"
 # ---- OMP (oh-my-pi coding agent) completions --------------------------------
 command -v omp &>/dev/null && eval "$(omp completions zsh)"
 
-# ---- Spaceship prompt (Tokyo Night colors) ----------------------------------
-SPACESHIP_PROMPT_ORDER=(
-  user
-  dir
-  host
-  git
-  node
-  python
-  docker
-  docker_compose
-  kubectl
-  exec_time
-  line_sep
-  jobs
-  exit_code
-  sudo
-  char
-)
-SPACESHIP_PROMPT_ADD_NEWLINE=true
-SPACESHIP_PROMPT_SEPARATE_LINE=true
-SPACESHIP_CHAR_SYMBOL='❯'
-SPACESHIP_CHAR_COLOR_SUCCESS='#9ece6a'
-SPACESHIP_CHAR_COLOR_FAILURE='#f7768e'
-SPACESHIP_USER_SHOW='needed'
-SPACESHIP_HOST_SHOW='ssh'
-SPACESHIP_DIR_COLOR='#7aa2f7'
-SPACESHIP_GIT_BRANCH_COLOR='#9d7cd8'
-SPACESHIP_GIT_STATUS_COLOR='#ff9e64'
-SPACESHIP_NODE_COLOR='#9ece6a'
-SPACESHIP_PYTHON_COLOR='#7dcfff'
-SPACESHIP_DOCKER_COLOR='#7aa2f7'
-SPACESHIP_KUBECTL_CONTEXT_COLOR='#1abc9c'
-SPACESHIP_EXEC_TIME_COLOR='#e0af68'
-SPACESHIP_EXIT_CODE_SHOW=true
-SPACESHIP_EXIT_CODE_COLOR='#f7768e'
-[[ -f "/usr/local/share/spaceship-prompt/spaceship.zsh" ]] && source "/usr/local/share/spaceship-prompt/spaceship.zsh"
+# ---- Starship prompt ---------------------------------------------------------
+if command -v starship &>/dev/null; then
+  export STARSHIP_CONFIG="$HOME/.config/starship.toml"
+  eval "$(starship init zsh)"
+fi
 
 # ---- Local overrides --------------------------------------------------------
 # Source a local, machine-specific file that is NOT committed to the repo.

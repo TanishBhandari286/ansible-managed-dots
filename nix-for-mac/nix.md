@@ -59,7 +59,7 @@ git add ~/dots/ssh_keys/id_ed25519.enc
 
 | Category | What you get |
 |----------|-------------|
-| **Shell** | zsh, zsh-completions, zsh-autosuggestions, zsh-syntax-highlighting, tmux |
+| **Shell** | zsh, zsh-completions, zsh-autosuggestions, zsh-syntax-highlighting, starship, tmux |
 | **Core replacements** | bat (cat), eza (ls), fd (find), ripgrep (grep), bottom (top), htop, tree |
 | **Git ecosystem** | git, delta (diff viewer), lazygit, gh (GitHub CLI) |
 | **Languages** | go + gopls, rustup, nodejs_22, bun, pnpm, python314, uv, cmake, llvm openmp |
@@ -68,7 +68,7 @@ git add ~/dots/ssh_keys/id_ed25519.enc
 | **Navigation** | fzf, zoxide, mise |
 | **System** | stow, topgrade, pkg-config, direnv, nil (Nix LSP), sops |
 
-Prompt is [spaceship-prompt](https://github.com/spaceship-prompt/spaceship-prompt), pinned via `pkgs.fetchFromGitHub` in `home/zsh.nix` (it isn't in nixpkgs, so it's fetched directly rather than listed above).
+Prompt is [starship](https://starship.rs), themed via `.config/starship.toml` (Tokyo Night colors).
 
 ### GUI apps (via Homebrew casks)
 
@@ -102,6 +102,7 @@ Prompt is [spaceship-prompt](https://github.com/spaceship-prompt/spaceship-promp
 | `.zshrc` | `~/.zshrc` (Nix-generated from template with store paths injected) |
 | `.gitconfig` | `~/.gitconfig` (includes `~/.gitconfig.local` for personal details) |
 | Ghostty config | `~/.config/ghostty/config` |
+| Starship config | `~/.config/starship.toml` |
 | Aerospace | `~/.config/aerospace/aerospace.toml` |
 | Neovim (LazyVim) | `~/.config/nvim/` |
 | SSH config | `~/.ssh/config` |
@@ -133,7 +134,7 @@ Prompt is [spaceship-prompt](https://github.com/spaceship-prompt/spaceship-promp
 | Change git config (shared) | `git/.gitconfig` | Shared settings, personal overrides in `~/.gitconfig.local` |
 | Change Neovim config | `.config/nvim/` | LazyVim — plugins, keymaps, options, autocmds |
 | Change SSH config | `ssh_keys/config` | SSH host definitions |
-| Change spaceship prompt config | `modules/zshrc.template` | `SPACESHIP_*` variables, near the bottom |
+| Change starship prompt config | `.config/starship.toml` | Segments, colors, format |
 | Change Ghostty config | `.config/ghostty/config` | Terminal colors, fonts, keybinds |
 | Change Aerospace config | `.config/aerospace/aerospace.toml` | Tiling rules, layouts, gaps |
 | Encrypt a new SSH key | Submit `ssh_keys/*.enc` to git | Use `sops -e -i ssh_keys/id_key` |
@@ -276,7 +277,7 @@ nix-for-mac/
     └── home/
         ├── default.nix           # home-manager entry point (imports files, zsh, programs)
         ├── files.nix             # dotfile symlinks + sessionPath
-        ├── zsh.nix               # generates .zshrc from template + colors + spaceship-prompt
+        ├── zsh.nix               # generates .zshrc from template + colors
         ├── programs.nix          # home-manager program modules (direnv, htop)
         ├── npm-globals.nix       # npm global installs (command-code) via home.activation
         └── colors.nix            # Tokyo Night (Storm) palette (imported by zsh.nix)
@@ -284,6 +285,7 @@ nix-for-mac/
 ../ (repo root)
 ├── .config/                      # dotfiles symlinked into ~/.config/
 │   ├── ghostty/config
+│   ├── starship.toml
 │   ├── aerospace/aerospace.toml
 │   └── nvim/                     # LazyVim config
 ├── git/

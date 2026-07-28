@@ -80,6 +80,7 @@ echo "── Linux ────────────────────�
 link "$DOTS_DIR/.zshrc"                 "$HOME/.zshrc"
 link "$DOTS_DIR/git/.gitconfig"         "$HOME/.gitconfig"
 link "$DOTS_DIR/.config/nvim"           "$HOME/.config/nvim"
+link "$DOTS_DIR/.config/starship.toml"  "$HOME/.config/starship.toml"
 
 echo ""
 echo "Done. Run 'exec zsh' to reload your shell."

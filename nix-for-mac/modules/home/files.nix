@@ -13,6 +13,7 @@
 
   xdg.configFile = {
     "ghostty/config".source = dotsPath + "/.config/ghostty/config";
+    "starship.toml".source = dotsPath + "/.config/starship.toml";
     "aerospace/aerospace.toml".source = dotsPath + "/.config/aerospace/aerospace.toml";
     "nvim" = {
       source = dotsPath + "/.config/nvim";

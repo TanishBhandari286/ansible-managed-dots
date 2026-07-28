@@ -48,7 +48,7 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/TanishBhandari286/ansibl
 
 | Category | Tools |
 |---|---|
-| Shell | zsh, spaceship-prompt, zsh-syntax-highlighting, zsh-autosuggestions, fzf |
+| Shell | zsh, starship, zsh-syntax-highlighting, zsh-autosuggestions, fzf |
 | Core replacements | eza (ls), bat (cat), fd (find), ripgrep (grep), zoxide (cd) |
 | Editor | Neovim (LazyVim) |
 | Git | git, lazygit, delta |
