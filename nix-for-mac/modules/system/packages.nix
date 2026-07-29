@@ -63,6 +63,8 @@
     pkg-config
     direnv
     nil                                # Nix LSP
+    nixfmt                              # Nix formatter (conform.nvim's "nixfmt")
+    statix                             # Nix linter (nvim-lint)
     sops                               # secrets management
   ];
 }
