@@ -30,7 +30,6 @@
     # — Languages & toolchains
     go
     gopls
-    rustup
     nodejs_22
     bun
     pnpm

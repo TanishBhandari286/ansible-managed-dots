@@ -22,6 +22,7 @@
       "portal"
       "omp"
       "mole"
+      "rust" # provides cargo + rustc
     ];
 
     casks = [
