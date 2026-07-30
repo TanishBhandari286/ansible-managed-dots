@@ -15,6 +15,7 @@
     "ghostty/config".source = dotsPath + "/.config/ghostty/config";
     "starship.toml".source = dotsPath + "/.config/starship.toml";
     "aerospace/aerospace.toml".source = dotsPath + "/.config/aerospace/aerospace.toml";
+    "tmux/tmux.conf".source = dotsPath + "/.config/tmux/tmux.conf";
     # Out-of-store symlink (not a recursive store copy): lazy.nvim needs to
     # write lazy-lock.json at runtime, which a Nix-store-backed recursive
     # symlink can never allow (read-only). This points straight at the live

@@ -81,6 +81,8 @@ link "$DOTS_DIR/.zshrc"                 "$HOME/.zshrc"
 link "$DOTS_DIR/git/.gitconfig"         "$HOME/.gitconfig"
 link "$DOTS_DIR/.config/nvim"           "$HOME/.config/nvim"
 link "$DOTS_DIR/.config/starship.toml"  "$HOME/.config/starship.toml"
+mkdir -p "$HOME/.config/tmux"
+link "$DOTS_DIR/.config/tmux/tmux.conf" "$HOME/.config/tmux/tmux.conf"
 
 echo ""
 echo "Done. Run 'exec zsh' to reload your shell."

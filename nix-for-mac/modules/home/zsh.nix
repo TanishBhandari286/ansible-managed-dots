@@ -6,10 +6,6 @@ let
   tokyonight = (import ./colors.nix).tokyonight;
 
   zshrc = pkgs.replaceVars ../zshrc.template {
-    zshFzfKeyBindings = "${pkgs.fzf}/share/fzf/key-bindings.zsh";
-    zshFzfCompletion = "${pkgs.fzf}/share/fzf/completion.zsh";
-    zshSyntaxHighlight = "${pkgs.zsh-syntax-highlighting}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh";
-    zshAutosuggest = "${pkgs.zsh-autosuggestions}/share/zsh-autosuggestions/zsh-autosuggestions.zsh";
     tn_bg = tokyonight.bg;
     tn_bg_highlight = tokyonight.bg_highlight;
     tn_fg = tokyonight.fg;

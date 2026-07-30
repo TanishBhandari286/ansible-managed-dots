@@ -31,7 +31,7 @@ setopt INC_APPEND_HISTORY
 
 # ---- Path -------------------------------------------------------------------
 typeset -U path
-path=("$HOME/.local/bin" "$HOME/bin" "$HOME/.cargo/bin" "/opt/homebrew/bin" $path)
+path=("$HOME/.local/bin" "$HOME/bin" "$HOME/.cargo/bin" "/opt/homebrew/bin" "/opt/homebrew/opt/node@22/bin" $path)
 
 # ---- Completion styling (Tokyo Night) ----------------------------------------
 zstyle ':completion:*' menu select
@@ -104,11 +104,11 @@ export FZF_CTRL_R_OPTS="
   --header 'CTRL-Y: copy  CTRL-/: toggle preview'
 "
 
-source @zshFzfKeyBindings@
-source @zshFzfCompletion@
+[[ -f /opt/homebrew/opt/fzf/shell/key-bindings.zsh ]] && source /opt/homebrew/opt/fzf/shell/key-bindings.zsh
+[[ -f /opt/homebrew/opt/fzf/shell/completion.zsh ]] && source /opt/homebrew/opt/fzf/shell/completion.zsh
 
 # ---- Zsh Syntax Highlighting -----------------------------------------------
-source @zshSyntaxHighlight@
+[[ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] && source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 typeset -A ZSH_HIGHLIGHT_STYLES
 ZSH_HIGHLIGHT_STYLES[command]='fg=@tn_green@,bold'
@@ -131,7 +131,7 @@ ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=@tn_red@,bold'
 ZSH_HIGHLIGHT_STYLES[reserved-word]='fg=@tn_blue@'
 
 # ---- Zsh Autosuggestions ----------------------------------------------------
-source @zshAutosuggest@
+[[ -f /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]] && source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=@tn_comment@,italic'
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)

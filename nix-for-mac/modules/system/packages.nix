@@ -1,69 +1,15 @@
 # ── packages.nix ───────────────────────────────────────────────────────
 # CLI tools installed via nixpkgs (system-wide).
+#
+# Kept minimal on purpose: nixpkgs' aarch64-darwin binary cache has far
+# fewer prebuilt bottles than Homebrew's, so anything not covered here
+# ends up compiling from source on this machine. Everything Homebrew
+# already bottles for Apple Silicon lives in homebrew.nix's `brews`
+# instead -- this file only holds `nil`, which Homebrew doesn't package.
 { config, pkgs, ... }:
 
 {
   environment.systemPackages = with pkgs; [
-    # — Shell & terminal
-    zsh-completions
-    zsh
-    zsh-autosuggestions
-    zsh-syntax-highlighting
-    starship
-    tmux
-
-    # — Core CLI replacements
-    bat                                # cat with syntax highlighting
-    eza                                # modern ls
-    fd                                 # modern find
-    ripgrep                            # modern grep
-    bottom                             # modern top (btm)
-    htop
-    tree
-
-    # — Git ecosystem
-    git
-    delta                              # better diff viewer
-    lazygit
-    gh                                 # GitHub CLI
-
-    # — Languages & toolchains
-    go
-    gopls
-    nodejs_22
-    bun
-    pnpm
-    python314
-    uv
-    cmake
-    pkgs.llvmPackages.openmp
-
-    # — DevOps / containers
-    lazydocker
-    ansible
-    age
-    wget
-    openssh
-
-    # — Editor
-    neovim
-    tree-sitter
-
-    # — Fuzzy finding & navigation
-    fzf
-    zoxide
-    mise
-
-    # — Dotfile / system management
-    stow
-    topgrade
-
-    # — Misc utilities
-    pkg-config
-    direnv
-    nil                                # Nix LSP
-    nixfmt                              # Nix formatter (conform.nvim's "nixfmt")
-    statix                             # Nix linter (nvim-lint)
-    sops                               # secrets management
+    nil # Nix LSP -- no Homebrew formula exists
   ];
 }
