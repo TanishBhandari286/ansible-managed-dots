@@ -20,3 +20,9 @@ end
 
 vim.keymap.set({ "n", "t" }, "<C-/>", toggle_file_dir_terminal, { desc = "Terminal (file dir)" })
 vim.keymap.set({ "n", "t" }, "<C-_>", toggle_file_dir_terminal, { desc = "which_key_ignore" })
+
+-- Find & replace in the current file. Normal mode targets the whole file
+-- (%s/...), visual mode targets the selection only (s/...). This overrides
+-- the default <C-f> (scroll page down); use <PageDown>/<C-d> for that instead.
+vim.keymap.set("n", "<C-f>", ":%s/", { desc = "Find & replace in file" })
+vim.keymap.set("v", "<C-f>", ":s/", { desc = "Find & replace in selection" })

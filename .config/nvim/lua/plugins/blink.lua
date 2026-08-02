@@ -12,7 +12,16 @@ return {
       completion = {
         list = {
           selection = {
-            preselect = true,
+            -- Preselect the top match (so <CR> accepts it) EXCEPT when the
+            -- word just typed is a bare number, e.g. "0"/"1" while writing a
+            -- loop counter or return value -- fuzzy-matching a lone digit
+            -- against the whole completion list often preselects some long,
+            -- irrelevant item, which <CR> would then insert instead of a
+            -- newline. Everywhere else, Enter-to-accept still works as normal.
+            preselect = function(ctx)
+              local keyword = ctx.line:sub(ctx.bounds.start_col + 1, ctx.bounds.start_col + ctx.bounds.length)
+              return not keyword:match("^%d+$")
+            end,
             auto_insert = true,
           },
         },
