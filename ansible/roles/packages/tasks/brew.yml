@@ -62,14 +62,6 @@
   become: true
   tags: [brew, apt_essentials]
 
-- name: Purge apt packages now managed by Homebrew
-  ansible.builtin.apt:
-    name: "{{ apt_cleanup_packages }}"
-    state: absent
-    purge: true
-  become: true
-  when: brew_check.rc == 0
-  tags: [brew, brew_cleanup]
 
 - name: Remove old manually-installed binaries from /usr/local/bin
   ansible.builtin.file:
