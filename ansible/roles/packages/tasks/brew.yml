@@ -7,7 +7,7 @@
 
 - name: Check if Homebrew is already installed
   ansible.builtin.command: brew --prefix
-  register: brew_prefix
+  register: brew_check
   failed_when: false
   changed_when: false
   become: false
@@ -22,13 +22,12 @@
   args:
     executable: /bin/bash
   become: false
-  when: brew_prefix.rc != 0
+  when: brew_check.rc != 0
   tags: [brew, brew_install]
 
-# ---- second check after install so we can set the fact -----------------------
 - name: Get Homebrew prefix (post-install)
   ansible.builtin.command: brew --prefix
-  register: brew_prefix
+  register: brew_check
   failed_when: false
   changed_when: false
   become: false
@@ -38,11 +37,10 @@
 
 - name: Set brew_prefix fact
   ansible.builtin.set_fact:
-    brew_prefix: "{{ brew_prefix.stdout }}"
-  when: brew_prefix.rc == 0
+    brew_prefix: "{{ brew_check.stdout }}"
+  when: brew_check.rc == 0
   tags: [brew, always]
 
-# ---- install packages --------------------------------------------------------
 - name: Install brew packages
   community.general.homebrew:
     name: "{{ brew_packages }}"
@@ -52,10 +50,9 @@
   become: false
   environment:
     PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_facts['env']['PATH'] }}"
-  when: brew_prefix.rc == 0
+  when: brew_check.rc == 0
   tags: [brew, brew_packages]
 
-# ---- apt packages kept deliberately (no brew equivalent) --------------------
 - name: Install build-essential (apt — no brew equivalent)
   ansible.builtin.apt:
     name: build-essential
@@ -65,52 +62,47 @@
   become: true
   tags: [brew, apt_essentials]
 
-# ---- clean up old apt packages -----------------------------------------------
 - name: Purge apt packages now managed by Homebrew
   ansible.builtin.apt:
     name: "{{ apt_cleanup_packages }}"
     state: absent
     purge: true
   become: true
-  when: brew_prefix.rc == 0
+  when: brew_check.rc == 0
   tags: [brew, brew_cleanup]
 
-# ---- clean up old GitHub-release binaries from /usr/local/bin -----------------
 - name: Remove old manually-installed binaries from /usr/local/bin
   ansible.builtin.file:
     path: "{{ item }}"
     state: absent
   loop: "{{ brew_cleanup_binaries }}"
   become: true
-  when: brew_prefix.rc == 0
+  when: brew_check.rc == 0
   tags: [brew, brew_cleanup]
 
-# ---- clean up old git-clone directories --------------------------------------
 - name: Remove old git-clone plugin directories
   ansible.builtin.file:
     path: "{{ item }}"
     state: absent
   loop: "{{ brew_cleanup_dirs }}"
   become: true
-  when: brew_prefix.rc == 0
+  when: brew_check.rc == 0
   tags: [brew, brew_cleanup]
 
-# ---- clean up zsh plugin files that may linger in /usr/local/share -----------
 - name: Purge leftover /usr/local/share/zsh directories
   ansible.builtin.file:
     path: /usr/local/share/zsh
     state: absent
   become: true
-  when: brew_prefix.rc == 0
+  when: brew_check.rc == 0
   tags: [brew, brew_cleanup]
 
-# ---- clean up deadsnakes PPA (python3.14 now managed by brew) ----------------
 - name: Remove deadsnakes PPA from apt sources
   ansible.builtin.file:
     path: /etc/apt/sources.list.d/deadsnakes-ppa.sources
     state: absent
   become: true
-  when: brew_prefix.rc == 0
+  when: brew_check.rc == 0
   tags: [brew, brew_cleanup]
 
 - name: Remove deadsnakes GPG key
@@ -118,5 +110,5 @@
     path: /etc/apt/keyrings/deadsnakes.asc
     state: absent
   become: true
-  when: brew_prefix.rc == 0
+  when: brew_check.rc == 0
   tags: [brew, brew_cleanup]
