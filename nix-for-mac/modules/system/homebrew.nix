@@ -41,6 +41,8 @@
       "portal"
       "omp"
       "mole"
+      "ffmpeg"
+      "yt-dlp"
 
       # — Shell & terminal
       "zsh-completions"
@@ -74,6 +76,7 @@
       "uv"
       "cmake"
       "libomp"
+      "telnet"
       "rust" # provides cargo + rustc
 
       # — DevOps / containers
@@ -109,7 +112,6 @@
       "aerospace"
       "antigravity"
       "brave-browser"
-      "claude-code"
       "font-jetbrains-mono"
       "gcloud-cli"
       "iina"
