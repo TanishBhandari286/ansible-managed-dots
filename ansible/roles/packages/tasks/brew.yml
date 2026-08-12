@@ -1,21 +1,25 @@
 ---
 # brew.yml — Install Homebrew on Linux, migrate packages from apt to brew,
 #            and clean up old apt packages, GitHub-release binaries, and git clones.
+#
+# IMPORTANT: Homebrew on Linux MUST NOT run as root. All brew tasks run as
+# the ansible_user. Cleanup tasks (apt, file removal) use become: true.
 
 - name: Check if Homebrew is already installed
   ansible.builtin.command: brew --prefix
   register: brew_prefix
   failed_when: false
   changed_when: false
+  environment:
+    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_facts['env']['PATH'] }}"
   tags: [brew, brew_install, always]
 
-- name: Install Homebrew (Linux)
+- name: Install Homebrew (Linux — must NOT run as root)
   ansible.builtin.shell: |
     set -euo pipefail
     NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   args:
     executable: /bin/bash
-  become: true
   when: brew_prefix.rc != 0
   tags: [brew, brew_install]
 
@@ -25,6 +29,8 @@
   register: brew_prefix
   failed_when: false
   changed_when: false
+  environment:
+    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_facts['env']['PATH'] }}"
   tags: [brew, brew_install, always]
 
 - name: Set brew_prefix fact
@@ -39,8 +45,11 @@
     name: "{{ brew_packages }}"
     state: present
     update_homebrew: true
-  become: true
+    path: /home/linuxbrew/.linuxbrew
+  environment:
+    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_facts['env']['PATH'] }}"
   when: brew_prefix.rc == 0
+  tags: [brew, brew_packages]
 
 # ---- apt packages kept deliberately (no brew equivalent) --------------------
 - name: Install build-essential (apt — no brew equivalent)
