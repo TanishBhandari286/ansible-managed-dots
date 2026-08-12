@@ -1,17 +1,11 @@
 ---
+# shell role — Set Zsh as default shell.
+# zsh itself is now installed by Homebrew; this role only registers it.
 
-- name: "[Linux] Install Zsh via apt"
-  ansible.builtin.apt:
-    name: zsh
-    state: present
-  become: true
-  when: ansible_facts['os_family'] == "Debian"
-  tags: [zsh_install]
-
-- name: "[Linux] Ensure Zsh is in /etc/shells"
+- name: "[Linux] Ensure Homebrew Zsh is in /etc/shells"
   ansible.builtin.lineinfile:
     path: /etc/shells
-    line: /bin/zsh
+    line: /home/linuxbrew/.linuxbrew/bin/zsh
     state: present
   become: true
   when: ansible_facts['os_family'] == "Debian"
@@ -20,7 +14,7 @@
 - name: "[Linux] Set Zsh as default shell for current user"
   ansible.builtin.user:
     name: "{{ ansible_user }}"
-    shell: /bin/zsh
+    shell: /home/linuxbrew/.linuxbrew/bin/zsh
   become: true
   when: ansible_facts['os_family'] == "Debian"
   tags: [zsh_install]

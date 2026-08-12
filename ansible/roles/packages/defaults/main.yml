@@ -1,6 +1,8 @@
 ---
 
-linux_packages:
+# ---- Brew packages (replaces apt + GitHub releases + git clones) ------------
+brew_packages:
+  # Base tools
   - zsh
   - git
   - curl
@@ -9,6 +11,58 @@ linux_packages:
   - tmux
   - htop
   - tree
-  - python3
+  - python@3.14
+  # Modern replacements
+  - neovim
+  - eza
+  - ripgrep
+  - fd
+  - bat
+  - lazydocker
+  # Shell tooling
+  - starship
+  - zoxide
+  - mise
+  - fzf
+  - zsh-syntax-highlighting
+  - zsh-autosuggestions
+  # Runtimes
+  - nvm
+  - node@22
+
+# ---- Apt packages to purge (now handled by brew) ---------------------------
+apt_cleanup_packages:
+  - zsh
+  - neovim
+  - eza
+  - bat
+  - ripgrep
+  - fd-find
+  - htop
+  - tree
+  - tmux
+  - unzip
+  - wget
+  - python3.14
+  - python3.14-venv
+  - python3.14-dev
+  - software-properties-common
+  - python3-debian
   - python3-pip
-  - build-essential
+  - python3
+
+# ---- Old manually-installed binaries to remove from /usr/local/bin ----------
+brew_cleanup_binaries:
+  - /usr/local/bin/eza
+  - /usr/local/bin/rg
+  - /usr/local/bin/fd
+  - /usr/local/bin/bat
+  - /usr/local/bin/fzf
+  - /usr/local/bin/omp
+  - /usr/local/bin/starship
+
+# ---- Old git-clone directories to purge -------------------------------------
+brew_cleanup_dirs:
+  - "{{ user_home }}/.fzf"
+  - /usr/local/share/zsh-syntax-highlighting
+  - /usr/local/share/zsh-autosuggestions

@@ -1,5 +1,9 @@
 ---
 
-- name: Include Debian specific tasks
+- name: Install Homebrew and migrate packages from apt
+  ansible.builtin.include_tasks: brew.yml
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: Run remaining apt / direct-download tasks
   ansible.builtin.include_tasks: debian.yml
   when: ansible_facts['os_family'] == 'Debian'

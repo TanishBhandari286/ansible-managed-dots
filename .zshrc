@@ -2,12 +2,21 @@
 # .zshrc — Feature-rich Zsh configuration
 # Managed by Ansible — edit at: dots/.zshrc
 # =============================================================================
-# Platform: Linux only (macOS is provisioned by nix-for-mac instead — see
-#           nix-for-mac/modules/zshrc.template for the Mac equivalent)
+# Platform: Linux + macOS (Homebrew on both)
 # Theme:    Tokyo Night (Storm) — matches the Ghostty "TokyoNight Storm" theme
 # Prompt:   starship
 # Features: fzf completions, syntax highlighting, autosuggestions, zoxide, eza
 # =============================================================================
+
+# ---- OS Detection & Homebrew prefix -----------------------------------------
+export ZSH_OS="$(uname -s)"
+if [[ "$ZSH_OS" == "Darwin" ]]; then
+  BREW_PREFIX="/opt/homebrew"
+elif [[ -d /home/linuxbrew/.linuxbrew ]]; then
+  BREW_PREFIX="/home/linuxbrew/.linuxbrew"
+else
+  BREW_PREFIX="/usr/local"
+fi
 
 # ---- Performance: only run compinit once per day ---------------------------
 autoload -Uz compinit
@@ -31,7 +40,8 @@ setopt INC_APPEND_HISTORY      # Write to history file immediately
 
 # ---- Path -------------------------------------------------------------------
 typeset -U path                # Ensure unique entries in $PATH
-path=("$HOME/.local/bin" "$HOME/bin" "$HOME/.cargo/bin" $path)
+# Homebrew first — takes priority over system packages
+path=("$BREW_PREFIX/bin" "$BREW_PREFIX/sbin" "$HOME/.local/bin" "$HOME/bin" "$HOME/.cargo/bin" $path)
 
 # ---- Completion styling (Tokyo Night) ----------------------------------------
 zstyle ':completion:*' menu select
@@ -117,13 +127,13 @@ export FZF_CTRL_R_OPTS="
   --header 'CTRL-Y: copy  CTRL-/: toggle preview'
 "
 
-# fzf is installed via its own git checkout + installer (~/.fzf), which
-# writes key-bindings + completion into a single ~/.fzf.zsh
-[[ -f "$HOME/.fzf.zsh" ]] && source "$HOME/.fzf.zsh"
+# fzf key-bindings + completion from Homebrew
+[[ -f "$BREW_PREFIX/opt/fzf/shell/key-bindings.zsh" ]] && source "$BREW_PREFIX/opt/fzf/shell/key-bindings.zsh"
+[[ -f "$BREW_PREFIX/opt/fzf/shell/completion.zsh" ]] && source "$BREW_PREFIX/opt/fzf/shell/completion.zsh"
 
 # ---- Zsh Syntax Highlighting -----------------------------------------------
 # Must be sourced BEFORE zsh-autosuggestions for correct color stacking
-ZSH_HL="/usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+ZSH_HL="$BREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 [[ -f "$ZSH_HL" ]] && source "$ZSH_HL"
 
 # Syntax highlighting color overrides (Tokyo Night Storm)
@@ -148,7 +158,7 @@ ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=#f7768e,bold'
 ZSH_HIGHLIGHT_STYLES[reserved-word]='fg=#7aa2f7'
 
 # ---- Zsh Autosuggestions ----------------------------------------------------
-ZSH_AS="/usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+ZSH_AS="$BREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
 [[ -f "$ZSH_AS" ]] && source "$ZSH_AS"
 
 # Autosuggestion styling

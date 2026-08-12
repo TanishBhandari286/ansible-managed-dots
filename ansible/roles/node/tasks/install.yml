@@ -1,14 +1,4 @@
 ---
-
-- name: Install curl and git (required by nvm)
-  ansible.builtin.apt:
-    name:
-      - curl
-      - git
-    state: present
-    update_cache: false
-  become: true
-
 - name: Check if nvm is already installed
   ansible.builtin.stat:
     path: "{{ user_home }}/.nvm/nvm.sh"
@@ -47,7 +37,6 @@
     HOME: "{{ user_home }}"
   become: true
   become_user: "{{ ansible_user }}"
-
 - name: Install/update command-code (coding agent) via npm
   ansible.builtin.shell:
     executable: /bin/bash
@@ -61,9 +50,3 @@
   become_user: "{{ ansible_user }}"
   tags: [command-code]
 
-- name: Install build-essential
-  ansible.builtin.apt:
-    name: build-essential
-    state: present
-    update_cache: false
-  become: true
