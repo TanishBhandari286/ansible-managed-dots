@@ -48,7 +48,7 @@
       ansible.builtin.command:
         cmd: brew bundle --file={{ brewfile }}
       environment:
-        PATH: "/opt/homebrew/bin:{{ ansible_facts['env']['PATH'] }}"
+        PATH: "/opt/homebrew/bin:/opt/homebrew/opt/node@22/bin:/opt/homebrew/opt/python@3.14/bin:{{ ansible_facts['env']['PATH'] }}"
 
     - name: Apply macOS system defaults
       community.general.osx_defaults:
