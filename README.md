@@ -1,11 +1,11 @@
 # dots — Personal Dotfiles & Infrastructure as Code
 
-One repo, two provisioning tools, split by platform:
+One repo, one provisioning tool: **Ansible**, targeting both platforms.
 
-- **macOS** → [Nix](https://nixos.org) (`nix-darwin` + `home-manager`), fully declarative. See [`nix-for-mac/nix.md`](nix-for-mac/nix.md) for the deep dive.
-- **Linux servers/VPS** → [Ansible](https://www.ansible.com/), in [`ansible/`](ansible).
+- **macOS** → Ansible + Homebrew (`brew bundle`). See `ansible/playbooks/mac.yml`.
+- **Linux servers/VPS** → Ansible + Homebrew. See `ansible/playbooks/linux.yml`.
 
-macOS used to be provisioned by Ansible too — it isn't anymore. Nix owns the Mac entirely now; the Ansible side only targets Linux.
+macOS was once provisioned by nix-darwin + home-manager — it isn't anymore. Ansible + Homebrew owns both platforms now.
 
 ---
 
@@ -14,16 +14,10 @@ macOS used to be provisioned by Ansible too — it isn't anymore. Nix owns the M
 One command, works whether you're the owner (SSH keys decrypt automatically) or a stranger trying the setup:
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/TanishBhandari286/ansible-managed-dots/main/nix-for-mac/bootstrap.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/TanishBhandari286/ansible-managed-dots/main/install.sh)"
 ```
 
-Not the owner? Set your own user/host first so it doesn't try to use mine:
-
-```bash
-NIX_USER=alice NIX_HOST=alices-macbook bash -c "$(curl -fsSL https://raw.githubusercontent.com/TanishBhandari286/ansible-managed-dots/main/nix-for-mac/bootstrap.sh)"
-```
-
-This installs Xcode CLI tools, Nix, Homebrew (for GUI apps Nix doesn't package), clones the repo, and builds the whole system. Update anytime with the `macupdate` shell alias.
+This installs Homebrew (if missing), installs all brews/casks/taps from `.config/Brewfile` via `brew bundle`, applies macOS system defaults, decrypts SSH keys with sops, and symlinks the dotfiles. Update anytime with the `macupdate` shell alias (runs `ansible-playbook playbooks/mac.yml`).
 
 ## Linux (servers / VPS)
 
@@ -52,28 +46,26 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/TanishBhandari286/ansibl
 | Core replacements | eza (ls), bat (cat), fd (find), ripgrep (grep), zoxide (cd) |
 | Editor | Neovim (LazyVim) |
 | Git | git, lazygit, delta |
-| Runtimes | mise (polyglot version manager), nvm + Node (Linux) / nixpkgs Node (Mac), Python 3.14 |
+| Runtimes | mise (polyglot version manager), node@22, Python 3.14 |
 | Containers | Docker, lazydocker |
 | Coding agents | [omp](https://omp.sh) (oh-my-pi), [command-code](https://commandcode.ai) |
 | Theme | Tokyo Night (Storm) — zsh colors, fzf, and the Ghostty terminal all match |
 
-Everything with upstream releases is pulled from the **latest GitHub release**, not the OS package manager — apt's versions of things like ripgrep/fd/bat/neovim lag behind, so those are fetched directly instead. Only genuinely stable/base packages (curl, git, build-essential, etc.) come from apt on Linux; on Mac, nixpkgs plays that role and tracks upstream closely on its own.
+Everything with upstream releases is pulled from the **latest Homebrew release**, not the OS package manager — apt's versions of things like ripgrep/fd/bat/neovim lag behind, so brew is used for those directly. Only genuinely stable/base packages (curl, git, build-essential, etc.) come from apt on Linux; on macOS, Homebrew plays that role and tracks upstream closely on its own.
 
 ## Repo layout
 
 ```
-.zshrc                   # Linux shell config (symlinked by ansible/roles/dotfiles)
-nix-for-mac/              # Everything macOS — nix-darwin + home-manager
-  bootstrap.sh            #   one-shot Mac setup script
-  modules/zshrc.template  #   Mac shell config (Nix-templated equivalent of .zshrc)
-  nix.md                  #   full reference: what's installed, how to add/remove things
-ansible/                  # Everything Linux
-  playbooks/linux.yml     #   the only playbook that matters now
-  roles/                  #   packages, node, docker, ssh, dotfiles
+.zshrc                    # cross-platform shell config (symlinked on both)
+.config/Brewfile          # macOS: single source of truth for brews/casks/taps
 .config/                  # App configs symlinked on both platforms (nvim, ghostty, ...)
+ansible/
+  playbooks/mac.yml       #   macOS provisioning (brew bundle + defaults + sops)
+  playbooks/linux.yml     #   Linux provisioning
+  roles/                  #   packages, shell, node, docker, ssh, dotfiles
 ssh_keys/                 # SSH keys, encrypted at rest with sops (age)
 ```
 
 ## Secrets
 
-SSH private keys live in `ssh_keys/*.enc`, encrypted with [sops](https://github.com/getsops/sops) + [age](https://github.com/FiloSottile/age). Ansible Vault handles other secrets under `ansible/group_vars/all/vault.yml`. Neither is readable without the corresponding key/password — see `nix-for-mac/nix.md` for the sops setup if you're forking this.
+SSH private keys live in `ssh_keys/*.enc`, encrypted with [sops](https://github.com/getsops/sops) + [age](https://github.com/FiloSottile/age). Ansible Vault handles other secrets under `ansible/group_vars/all/vault.yml`. Neither is readable without the corresponding key/password.

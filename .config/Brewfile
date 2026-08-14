@@ -48,7 +48,7 @@ brew "tree-sitter"
 # Ambitious Vim-fork focused on extensibility and agility
 brew "neovim"
 # Open-source, cross-platform JavaScript runtime environment
-brew "node"
+brew "node@22"
 # OpenBSD freely-licensed SSH connectivity tools
 brew "openssh"
 # Painless compression and decompression for your terminal

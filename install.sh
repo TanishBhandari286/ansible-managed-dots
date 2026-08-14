@@ -67,11 +67,35 @@ link() {
 
 mkdir -p "$HOME/.config"
 
-# macOS is provisioned by nix-for-mac (nix-darwin + home-manager) instead —
-# see nix-for-mac/bootstrap.sh. This script only runs via the Linux ansible
-# dotfiles role.
+# macOS was provisioned by nix-for-mac; now it's Ansible + Homebrew, same as
+# Linux. Symlink the dotfiles per-platform.
+if [[ "$OS" == "Darwin" ]]; then
+  echo ""
+  echo "── macOS ────────────────────────────────────────────────────────────────"
+  link "$DOTS_DIR/.zshrc"                 "$HOME/.zshrc"
+  link "$DOTS_DIR/git/.gitconfig"         "$HOME/.gitconfig"
+  # ~/.gitconfig.local holds personal identity (name/email) — never overwrite
+  # it; only seed from the example if it doesn't exist yet.
+  if [[ ! -e "$HOME/.gitconfig.local" ]]; then
+    cp "$DOTS_DIR/git/.gitconfig.local.example" "$HOME/.gitconfig.local"
+    info "Created ~/.gitconfig.local from example — EDIT it with your details!"
+  else
+    skip "~/.gitconfig.local exists — keeping your personal identity"
+  fi
+  link "$DOTS_DIR/.config/nvim"           "$HOME/.config/nvim"
+  link "$DOTS_DIR/.config/starship.toml"  "$HOME/.config/starship.toml"
+  link "$DOTS_DIR/.config/ghostty/config" "$HOME/.config/ghostty/config"
+  link "$DOTS_DIR/.config/aerospace"      "$HOME/.config/aerospace"
+  mkdir -p "$HOME/.config/tmux"
+  link "$DOTS_DIR/.config/tmux/tmux.conf" "$HOME/.config/tmux/tmux.conf"
+  link "$DOTS_DIR/ssh_keys/config"        "$HOME/.ssh/config"
+  echo ""
+  echo "Done. Run 'exec zsh' to reload your shell."
+  exit 0
+fi
+
 if [[ "$OS" != "Linux" ]]; then
-  printf 'Unsupported OS: %s (macOS uses nix-for-mac/bootstrap.sh instead)\n' "$OS" >&2
+  printf 'Unsupported OS: %s\n' "$OS" >&2
   exit 1
 fi
 

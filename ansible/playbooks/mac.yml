@@ -1,0 +1,98 @@
+---
+# mac.yml — Provision macOS workstation (Ansible + Homebrew).
+# Replaces the old nix-darwin + home-manager setup. Nix is gone; Homebrew
+# (via `brew bundle` on .config/Brewfile) is the single source of truth for
+# packages, casks, taps, VSCode extensions, go and npm globals.
+
+- name: Provision macOS workstation
+  hosts: localhost
+  connection: local
+  gather_facts: true
+
+  vars:
+    dots_dir: "{{ ansible_facts['env']['HOME'] }}/dots"
+    brewfile: "{{ dots_dir }}/.config/Brewfile"
+    mac_defaults:
+      # Dock
+      - { domain: com.apple.dock, key: autohide, type: bool, value: "true" }
+      - { domain: com.apple.dock, key: mru-spaces, type: bool, value: "false" }
+      - { domain: com.apple.dock, key: orientation, type: string, value: "bottom" }
+      # Finder
+      - { domain: com.apple.finder, key: AppleShowAllExtensions, type: bool, value: "true" }
+      - { domain: com.apple.finder, key: FXPreferredViewStyle, type: string, value: "Nlsv" }
+      - { domain: com.apple.finder, key: ShowPathbar, type: bool, value: "true" }
+      - { domain: com.apple.finder, key: ShowStatusBar, type: bool, value: "true" }
+      # Keyboard
+      - { domain: NSGlobalDomain, key: AppleKeyboardUIMode, type: int, value: "3" }
+      - { domain: NSGlobalDomain, key: KeyRepeat, type: int, value: "2" }
+      - { domain: NSGlobalDomain, key: InitialKeyRepeat, type: int, value: "15" }
+      # Screenshots
+      - { domain: com.apple.screencapture, key: location, type: string, value: "~/Pictures/Screenshots" }
+
+  pre_tasks:
+    - name: Verify we are running on macOS
+      ansible.builtin.assert:
+        that: ansible_facts['os_family'] == 'Darwin'
+        fail_msg: "This playbook targets macOS only."
+
+  tasks:
+    - name: Ensure Homebrew is installed
+      ansible.builtin.shell: |
+        command -v brew >/dev/null 2>&1 || \
+          NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      args:
+        executable: /bin/bash
+      changed_when: false
+
+    - name: Install all bundles (brews, casks, taps, vscode, go, npm)
+      ansible.builtin.command:
+        cmd: brew bundle --file={{ brewfile }}
+      environment:
+        PATH: "/opt/homebrew/bin:{{ ansible_facts['env']['PATH'] }}"
+
+    - name: Apply macOS system defaults
+      community.general.osx_defaults:
+        domain: "{{ item.domain }}"
+        key: "{{ item.key }}"
+        type: "{{ item.type }}"
+        value: "{{ item.value }}"
+      loop: "{{ mac_defaults }}"
+
+    - name: Restart Dock and Finder so defaults take effect
+      ansible.builtin.shell: |
+        killall Dock 2>/dev/null || true
+        killall Finder 2>/dev/null || true
+        killall SystemUIServer 2>/dev/null || true
+      args:
+        executable: /bin/bash
+      changed_when: false
+
+    - name: Decrypt SSH keys via sops + age
+      ansible.builtin.shell: |
+        set -euo pipefail
+        if [ ! -f "$HOME/.config/sops/age/keys.txt" ]; then
+          echo "No age key at ~/.config/sops/age/keys.txt — skipping SSH key decryption."
+          exit 0
+        fi
+        mkdir -p "$HOME/.ssh"
+        for enc in {{ dots_dir }}/ssh_keys/*.enc; do
+          [ -f "$enc" ] || continue
+          name="$(basename "$enc" .enc)"
+          target="$HOME/.ssh/$name"
+          if [ ! -f "$target" ]; then
+            sops -d "$enc" > "$target"
+            chmod 600 "$target"
+            echo "Decrypted: $name"
+          fi
+        done
+      args:
+        executable: /bin/bash
+      environment:
+        PATH: "/opt/homebrew/bin:{{ ansible_facts['env']['PATH'] }}"
+      changed_when: false
+
+    - name: Symlink dotfiles via install.sh
+      ansible.builtin.command:
+        cmd: ./install.sh
+        chdir: "{{ dots_dir }}"
+      changed_when: false

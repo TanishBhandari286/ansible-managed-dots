@@ -41,7 +41,7 @@ setopt INC_APPEND_HISTORY      # Write to history file immediately
 # ---- Path -------------------------------------------------------------------
 typeset -U path                # Ensure unique entries in $PATH
 # Homebrew first — takes priority over system packages
-path=("$BREW_PREFIX/bin" "$BREW_PREFIX/sbin" "$HOME/.local/bin" "$HOME/bin" "$HOME/.cargo/bin" $path)
+path=("$BREW_PREFIX/bin" "$BREW_PREFIX/sbin" "$BREW_PREFIX/opt/node@22/bin" "$BREW_PREFIX/opt/python@3.14/bin" "$HOME/.local/bin" "$HOME/bin" "$HOME/.cargo/bin" $path)
 
 # ---- Completion styling (Tokyo Night) ----------------------------------------
 zstyle ':completion:*' menu select
@@ -226,28 +226,17 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias path='echo -e ${PATH//:/\\n}'     # Pretty-print PATH entries
-alias reload='exec zsh'                  # Reload this config
+alias macupdate='(cd ~/dots/ansible && ansible-playbook playbooks/mac.yml)'
 alias linuxansible='(cd ~/dots/ansible && ansible-playbook playbooks/linux.yml)'
 
 # ---- Editor -----------------------------------------------------------------
 export EDITOR='nvim'
 export VISUAL='nvim'
-
 # ---- Language / Tool paths --------------------------------------------------
-# Python (pyenv or system)
-if command -v pyenv &>/dev/null; then
-  export PYENV_ROOT="$HOME/.pyenv"
-  path=("$PYENV_ROOT/bin" $path)
-  eval "$(pyenv init -)"
-fi
+# Node via brew node@22 (keg-only, PATH entry above); Python via brew python@3.14.
 
 # Node / npm global bins
 [[ -d "$HOME/.npm-global/bin" ]] && path=("$HOME/.npm-global/bin" $path)
-
-# nvm (Node is managed via nvm on Linux)
-export NVM_DIR="$HOME/.nvm"
-[[ -s "$NVM_DIR/nvm.sh" ]] && \. "$NVM_DIR/nvm.sh"
-[[ -s "$NVM_DIR/bash_completion" ]] && \. "$NVM_DIR/bash_completion"
 
 # Cargo (Rust)
 [[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
