@@ -47,8 +47,6 @@ brew "mole"
 brew "tree-sitter"
 # Ambitious Vim-fork focused on extensibility and agility
 brew "neovim"
-# Open-source, cross-platform JavaScript runtime environment
-brew "node@22"
 # OpenBSD freely-licensed SSH connectivity tools
 brew "openssh"
 # Painless compression and decompression for your terminal
@@ -151,6 +149,3 @@ vscode "tomoki1207.pdf"
 vscode "vizards.deepseek-v4-for-copilot"
 vscode "yzhang.markdown-all-in-one"
 go "golang.org/x/tools/gopls"
-npm "command-code"
-npm "eslint"
-npm "tree-sitter-cli"

@@ -7,8 +7,7 @@ GitHub Repository [icon: github]
 
 // Bootstrapping Phase
 Bootstrap Scripts [icon: terminal] {
-  bootstrap.sh
-  bootstrap-public-mac.sh
+  install.sh
   bootstrap-public-linux.sh
 }
 
@@ -17,10 +16,9 @@ Ansible Provisioning [icon: settings] {
   Playbooks [icon: list] {
     mac.yml
     linux.yml
-    public-mac.yml
     public-linux.yml
   }
-  
+
   Roles [icon: layers] {
     packages [icon: package]
     shell [icon: terminal]
@@ -40,14 +38,14 @@ Target Systems [icon: monitor] {
 // Execution Flow
 User > Bootstrap Scripts: Executes via curl bash
 Bootstrap Scripts > GitHub Repository: Clones dots repo
-Bootstrap Scripts > Playbooks: Triggers Ansible Playbook
+Bootstrap Scripts > Ansible Provisioning: Triggers Ansible Playbook
 
-Playbooks > Roles: Orchestrates execution
+Ansible Provisioning > Playbooks: Orchestrates execution
 
 // Role Actions
-packages > Target Systems: Installs system packages (brew/apt)
-shell > Target Systems: Sets up Zsh & Starship prompt
-node > Target Systems: Installs Node.js environment
+packages > Target Systems: Installs Homebrew + brew packages
+shell > Target Systems: Sets up Zsh as default shell
+node > Target Systems: Installs Node.js 22 via mise
 docker > Linux Server: Configures Docker runtime
 ssh > Target Systems: Installs Private SSH Keys (Owner only)
 dotfiles > Target Systems: Symlinks configuration files

@@ -1,6 +1,6 @@
 ---
  
-- name: Install nvm and Node.js 22 LTS
+- name: Install Node.js 22 LTS via mise
   ansible.builtin.import_tasks: install.yml
   when: ansible_facts['os_family'] == "Debian"
   tags: [node, nodejs, devtools]

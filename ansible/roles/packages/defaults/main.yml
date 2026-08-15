@@ -11,7 +11,6 @@ brew_packages:
   - tmux
   - htop
   - tree
-  - python@3.14
   # Modern replacements
   - neovim
   - eza
@@ -26,9 +25,8 @@ brew_packages:
   - fzf
   - zsh-syntax-highlighting
   - zsh-autosuggestions
-  # Runtimes
-  - nvm
-  - node@22
+  # Runtimes — mise manages node
+  - python@3.14
 
 
 # ---- Old manually-installed binaries to remove from /usr/local/bin ----------
@@ -38,7 +36,6 @@ brew_cleanup_binaries:
   - /usr/local/bin/fd
   - /usr/local/bin/bat
   - /usr/local/bin/fzf
-  - /usr/local/bin/omp
   - /usr/local/bin/starship
 
 # ---- Old git-clone directories to purge -------------------------------------

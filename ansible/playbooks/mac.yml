@@ -48,7 +48,24 @@
       ansible.builtin.command:
         cmd: brew bundle --file={{ brewfile }}
       environment:
-        PATH: "/opt/homebrew/bin:/opt/homebrew/opt/node@22/bin:/opt/homebrew/opt/python@3.14/bin:{{ ansible_facts['env']['PATH'] }}"
+        PATH: "/opt/homebrew/bin:/opt/homebrew/opt/python@3.14/bin:{{ ansible_facts['env']['PATH'] }}"
+
+    - name: Install Node.js 22 via mise
+      ansible.builtin.shell: |
+        set -euo pipefail
+        mise use -g node@22
+      environment:
+        PATH: "/opt/homebrew/bin:{{ ansible_facts['env']['PATH'] }}"
+      changed_when: false
+
+    - name: Install npm globals via mise node
+      ansible.builtin.shell: |
+        set -euo pipefail
+        eval "$(mise activate bash)"
+        npm install -g command-code@latest eslint@latest tree-sitter-cli@latest
+      environment:
+        PATH: "/opt/homebrew/bin:{{ ansible_facts['env']['PATH'] }}"
+      changed_when: false
 
     - name: Apply macOS system defaults
       community.general.osx_defaults:

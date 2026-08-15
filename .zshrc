@@ -41,7 +41,7 @@ setopt INC_APPEND_HISTORY      # Write to history file immediately
 # ---- Path -------------------------------------------------------------------
 typeset -U path                # Ensure unique entries in $PATH
 # Homebrew first — takes priority over system packages
-path=("$BREW_PREFIX/bin" "$BREW_PREFIX/sbin" "$BREW_PREFIX/opt/node@22/bin" "$BREW_PREFIX/opt/python@3.14/bin" "$HOME/.local/bin" "$HOME/bin" "$HOME/.cargo/bin" $path)
+path=("$BREW_PREFIX/bin" "$BREW_PREFIX/sbin" "$BREW_PREFIX/opt/python@3.14/bin" "$HOME/.local/bin" "$HOME/bin" "$HOME/.cargo/bin" $path)
 
 # ---- Completion styling (Tokyo Night) ----------------------------------------
 zstyle ':completion:*' menu select
@@ -233,7 +233,7 @@ alias linuxansible='(cd ~/dots/ansible && ansible-playbook playbooks/linux.yml)'
 export EDITOR='nvim'
 export VISUAL='nvim'
 # ---- Language / Tool paths --------------------------------------------------
-# Node via brew node@22 (keg-only, PATH entry above); Python via brew python@3.14.
+# Node is managed via mise (activated below); Python via brew python@3.14.
 
 # Node / npm global bins
 [[ -d "$HOME/.npm-global/bin" ]] && path=("$HOME/.npm-global/bin" $path)
