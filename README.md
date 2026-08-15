@@ -60,12 +60,12 @@ Everything with upstream releases is pulled from the **latest Homebrew release**
 .config/Brewfile          # macOS: single source of truth for brews/casks/taps
 .config/                  # App configs symlinked on both platforms (nvim, ghostty, ...)
 ansible/
-  playbooks/mac.yml       #   macOS provisioning (brew bundle + defaults + sops)
+  playbooks/mac.yml       #   macOS provisioning (brew bundle + defaults + vault)
   playbooks/linux.yml     #   Linux provisioning
   roles/                  #   packages, shell, node, docker, ssh, dotfiles
-ssh_keys/                 # SSH keys, encrypted at rest with sops (age)
+ssh_keys/                 # SSH keys, encrypted at rest with Ansible Vault
 ```
 
 ## Secrets
 
-SSH private keys live in `ssh_keys/id_*` (no extension), encrypted with **Ansible Vault**. The vault password file is `ansible/.vault_pass` (gitignored). `.pub` files are committed in plaintext. Everything is decryptable with `ansible-vault view`. (Legacy sops + age `.enc` files were removed — Vault is the single secret system now.)
+SSH private keys live in `ssh_keys/id_*` (no extension), encrypted with **Ansible Vault**. The vault password file is `ansible/.vault_pass` (gitignored). `.pub` files are committed in plaintext. Everything is decryptable with `ansible-vault view`.

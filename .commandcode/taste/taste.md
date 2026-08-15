@@ -7,6 +7,3 @@
 - Shell-rc dotfiles must include initialization for all version managers and CLI tools installed by playbooks (e.g., nvm init in `.zshrc`). Tools should work immediately in the user's configured login shell without requiring manual fixes after provisioning. Confidence: 0.70
 - Prefer upgrading CLI tools to their absolute latest version rather than staying on the LTS-bundled default. When a tool like npm itself notifies about a newer major version, upgrade to it — don't settle for "this is what ships with Node 22 LTS." Confidence: 0.80
 - When applying a fix or upgrade to a managed machine, apply it both immediately (live, via SSH) and codify it in the automation playbook for future reproducibility. "Fix it now AND fix it forever" — never leave the playbook stale while patching the live system. Confidence: 0.85
-
-# nix
-See [nix/taste.md](nix/taste.md)

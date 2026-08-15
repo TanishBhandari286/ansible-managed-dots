@@ -1,4 +1,4 @@
-# Shared git config — loaded by home-manager to ~/.gitconfig.
+# Shared git config — symlinked to ~/.gitconfig by install.sh.
 # Personal details (name, email, signing key) go in ~/.gitconfig.local.
 # Copy git/.gitconfig.local.example as a starting point.
 

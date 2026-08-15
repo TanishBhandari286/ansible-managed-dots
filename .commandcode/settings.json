@@ -3,15 +3,14 @@
     "allow": [
       "Shell(grep:*)",
       "Shell(xxd:*)",
-      "Shell(sudo darwin-rebuild switch --flake . 2 >& 1)",
       "Shell(ssh -F /Users/devops/dots/ssh_keys/config -G vps 2 >& 1)",
       "Shell(ssh -F /Users/devops/dots/ssh_keys/config -G master-node 2 >& 1)",
       "Shell(ssh -F /Users/devops/dots/ssh_keys/config -G server-node 2 >& 1)",
       "Shell(ssh -F /Users/devops/dots/ssh_keys/config -G github.com 2 >& 1)",
-      "Shell(nix:*)",
       "Shell(find:*)",
       "Shell(ansible-playbook:*)",
-      "Shell(brew:*)"
+      "Shell(brew:*)",
+      "Shell(mise:*)"
     ],
     "deny": [],
     "defaultMode": "default"

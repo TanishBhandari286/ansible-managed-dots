@@ -13,7 +13,6 @@ ansible/.vault_pass
 *.vault_pass
 ssh_keys/id_*
 !ssh_keys/id_*.pub
-!ssh_keys/id_*.enc
 ansible/*.retry
 ansible/.cache/
 ansible/fact_cache/
