@@ -7,10 +7,11 @@
 ansible/.vault_pass
 *.vault_pass
 
-# --- SSH private keys — encrypted with sops, never plaintext -----------------
+# --- SSH private keys — Ansible Vault-encrypted, tracked in git --------------
+# `id_*` (no extension) = vault ciphertext → committed. `.pub` = public → committed.
+# (Legacy sops `.enc` files removed — vault is now the single secret system.)
 ssh_keys/id_*
 !ssh_keys/id_*.pub
-!ssh_keys/id_*.enc
 
 # --- Ansible runtime artifacts -----------------------------------------------
 ansible/*.retry

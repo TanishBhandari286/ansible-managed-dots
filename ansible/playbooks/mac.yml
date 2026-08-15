@@ -44,16 +44,26 @@
         executable: /bin/bash
       changed_when: false
 
-    - name: Install all bundles (brews, casks, taps, vscode, go, npm)
+    - name: Install all bundles (brews, casks, taps, vscode)
       ansible.builtin.command:
         cmd: brew bundle --file={{ brewfile }}
       environment:
         PATH: "/opt/homebrew/bin:/opt/homebrew/opt/python@3.14/bin:{{ ansible_facts['env']['PATH'] }}"
 
-    - name: Install Node.js 22 via mise
+    - name: Install runtimes via mise (node, go)
       ansible.builtin.shell: |
         set -euo pipefail
         mise use -g node@22
+        mise use -g go@latest
+      environment:
+        PATH: "/opt/homebrew/bin:{{ ansible_facts['env']['PATH'] }}"
+      changed_when: false
+
+    - name: Install go tools (gopls)
+      ansible.builtin.shell: |
+        set -euo pipefail
+        eval "$(mise activate bash)"
+        go install golang.org/x/tools/gopls@latest
       environment:
         PATH: "/opt/homebrew/bin:{{ ansible_facts['env']['PATH'] }}"
       changed_when: false
@@ -84,20 +94,20 @@
         executable: /bin/bash
       changed_when: false
 
-    - name: Decrypt SSH keys via sops + age
+    - name: Decrypt SSH keys from Ansible Vault
       ansible.builtin.shell: |
         set -euo pipefail
-        if [ ! -f "$HOME/.config/sops/age/keys.txt" ]; then
-          echo "No age key at ~/.config/sops/age/keys.txt — skipping SSH key decryption."
-          exit 0
-        fi
         mkdir -p "$HOME/.ssh"
-        for enc in {{ dots_dir }}/ssh_keys/*.enc; do
-          [ -f "$enc" ] || continue
-          name="$(basename "$enc" .enc)"
+        for vault_file in {{ dots_dir }}/ssh_keys/id_*; do
+          # Skip .pub (plaintext) and .enc (removed sops legacy) files
+          case "$vault_file" in
+            *.pub|*.enc) continue ;;
+          esac
+          [ -f "$vault_file" ] || continue
+          name="$(basename "$vault_file")"
           target="$HOME/.ssh/$name"
           if [ ! -f "$target" ]; then
-            sops -d "$enc" > "$target"
+            ansible-vault view "$vault_file" > "$target"
             chmod 600 "$target"
             echo "Decrypted: $name"
           fi
@@ -106,6 +116,7 @@
         executable: /bin/bash
       environment:
         PATH: "/opt/homebrew/bin:{{ ansible_facts['env']['PATH'] }}"
+        ANSIBLE_VAULT_PASSWORD_FILE: "{{ dots_dir }}/ansible/.vault_pass"
       changed_when: false
 
     - name: Symlink dotfiles via install.sh

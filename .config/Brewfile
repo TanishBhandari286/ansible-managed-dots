@@ -3,8 +3,6 @@ tap "can1357/tap"
 tap "domt4/autoupdate", "https://github.com/DomT4/homebrew-autoupdate.git", trusted: true
 tap "nikitabobko/tap", trusted: true
 tap "tw93/tap", trusted: true
-# Simple, modern, secure file encryption
-brew "age"
 # Interpreted, interactive, object-oriented programming language
 brew "python@3.14"
 # Display directories as trees (with optional color/HTML output)
@@ -29,8 +27,6 @@ brew "fzf"
 brew "git"
 # Syntax-highlighting pager for git and diff output
 brew "git-delta"
-# Open source programming language to build simple/reliable/efficient software
-brew "go"
 # Improved top (interactive process viewer)
 brew "htop"
 # Lazier way to manage everything docker
@@ -148,4 +144,3 @@ vscode "teabyii.ayu"
 vscode "tomoki1207.pdf"
 vscode "vizards.deepseek-v4-for-copilot"
 vscode "yzhang.markdown-all-in-one"
-go "golang.org/x/tools/gopls"

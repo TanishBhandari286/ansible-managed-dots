@@ -17,7 +17,7 @@ One command, works whether you're the owner (SSH keys decrypt automatically) or 
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/TanishBhandari286/ansible-managed-dots/main/install.sh)"
 ```
 
-This installs Homebrew (if missing), installs all brews/casks/taps from `.config/Brewfile` via `brew bundle`, applies macOS system defaults, decrypts SSH keys with sops, and symlinks the dotfiles. Update anytime with the `macupdate` shell alias (runs `ansible-playbook playbooks/mac.yml`).
+This installs Homebrew (if missing), installs all brews/casks/taps from `.config/Brewfile` via `brew bundle`, installs Node/Go via mise, applies macOS system defaults, decrypts SSH keys with Ansible Vault, and symlinks the dotfiles. Update anytime with the `macupdate` shell alias (runs `ansible-playbook playbooks/mac.yml`).
 
 ## Linux (servers / VPS)
 
@@ -68,4 +68,4 @@ ssh_keys/                 # SSH keys, encrypted at rest with sops (age)
 
 ## Secrets
 
-SSH private keys live in `ssh_keys/*.enc`, encrypted with [sops](https://github.com/getsops/sops) + [age](https://github.com/FiloSottile/age). Ansible Vault handles other secrets under `ansible/group_vars/all/vault.yml`. Neither is readable without the corresponding key/password.
+SSH private keys live in `ssh_keys/id_*` (no extension), encrypted with **Ansible Vault**. The vault password file is `ansible/.vault_pass` (gitignored). `.pub` files are committed in plaintext. Everything is decryptable with `ansible-vault view`. (Legacy sops + age `.enc` files were removed — Vault is the single secret system now.)
