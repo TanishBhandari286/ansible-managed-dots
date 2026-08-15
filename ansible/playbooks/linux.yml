@@ -24,7 +24,7 @@
   roles:
     - { role: packages,  become: true,  tags: [packages, apt] }
     - { role: shell,           become: true,  tags: [shell, zsh] }
-    - { role: node,      become: true,  tags: [node, nodejs, devtools] }
+    - { role: node,      become: true,  tags: [node, mise, runtimes] }
     - { role: docker,    become: true,  tags: [docker, containers] }
 
     - { role: ssh,       become: false, tags: [ssh, keys] }

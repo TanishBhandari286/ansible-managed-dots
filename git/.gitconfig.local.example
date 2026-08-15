@@ -9,8 +9,6 @@
 [commit]
 	gpgsign = false
 
-# For macOS with YubiKey/FIDO2:
-# [user]
-# 	signingkey = ~/.ssh/id_ed25519_sk.pub
+# Optional: sign commits with an SSH key.
 # [gpg]
 # 	format = ssh
