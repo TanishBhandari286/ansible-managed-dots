@@ -10,7 +10,7 @@
   changed_when: false
   environment:
     HOME: "{{ user_home }}"
-    PATH: "{{ user_home }}/.local/bin:{{ ansible_facts['env']['PATH'] }}"
+    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ user_home }}/.local/bin:{{ ansible_facts['env']['PATH'] }}"
   become: false
 
 - name: Get npm version via mise
@@ -22,7 +22,7 @@
   changed_when: false
   environment:
     HOME: "{{ user_home }}"
-    PATH: "{{ user_home }}/.local/bin:{{ ansible_facts['env']['PATH'] }}"
+    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ user_home }}/.local/bin:{{ ansible_facts['env']['PATH'] }}"
   become: false
 
 - name: Verify node is 22.x

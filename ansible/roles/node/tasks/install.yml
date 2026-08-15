@@ -7,6 +7,8 @@
   register: mise_check
   failed_when: false
   changed_when: false
+  environment:
+    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ user_home }}/.local/bin:{{ ansible_facts['env']['PATH'] }}"
 
 - name: Install Node.js 22 LTS via mise
   ansible.builtin.shell: |
@@ -14,7 +16,7 @@
     mise use -g node@22
   environment:
     HOME: "{{ user_home }}"
-    PATH: "{{ user_home }}/.local/bin:{{ ansible_facts['env']['PATH'] }}"
+    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ user_home }}/.local/bin:{{ ansible_facts['env']['PATH'] }}"
   become: false
   when: mise_check.rc == 0
 
@@ -25,7 +27,7 @@
     npm install -g command-code@latest
   environment:
     HOME: "{{ user_home }}"
-    PATH: "{{ user_home }}/.local/bin:{{ ansible_facts['env']['PATH'] }}"
+    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ user_home }}/.local/bin:{{ ansible_facts['env']['PATH'] }}"
   become: false
   when: mise_check.rc == 0
   tags: [command-code]
