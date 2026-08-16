@@ -1,3 +1,6 @@
+# Shared hosts live below. Personal (machine-local) overrides go in
+# ~/.ssh/config.dots-local, which is INCLUDED here — keep only deltas there,
+# never duplicate the Host blocks defined in this file.
 Include ~/.ssh/config.dots-local
 
 Host *
@@ -22,7 +25,3 @@ Host master-node
     User master-node
     IdentityFile ~/.ssh/id_ed25519_ansible
 
-Host server-node
-    HostName 192.168.29.11
-    User server-node
-    IdentityFile ~/.ssh/id_ed25519_ansible
