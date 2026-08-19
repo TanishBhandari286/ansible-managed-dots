@@ -1,7 +1,7 @@
 # ~/.config/ghostty/config
 
 # Theme
-theme = TokyoNight Storm
+theme = Catppuccin Mocha
 term = xterm-256color
 
 # Font (Change to your preferred Nerd Font)

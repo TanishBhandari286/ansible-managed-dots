@@ -25,3 +25,8 @@ Host master-node
     User master-node
     IdentityFile ~/.ssh/id_ed25519_ansible
 
+Host cp
+    HostName 192.168.29.104
+    User cp
+    IdentityFile ~/.ssh/id_ed25519_ansible
+
