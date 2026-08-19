@@ -49,6 +49,13 @@
         cmd: brew bundle --file={{ brewfile }}
       environment:
         PATH: "/opt/homebrew/bin:/opt/homebrew/opt/python@3.14/bin:{{ ansible_facts['env']['PATH'] }}"
+        # Non-interactive run: no TTY for sudo. Skip the obs cask upgrade —
+        # its uninstall stanza sudo-deletes the root-owned virtualcam plugin
+        # and would abort the whole bundle. Upgrade obs manually in a terminal.
+        HOMEBREW_BUNDLE_CASK_SKIP: "obs"
+        HOMEBREW_NO_AUTO_UPDATE: "1"
+        HOMEBREW_NO_INSTALL_CLEANUP: "1"
+        HOMEBREW_NO_ENV_HINTS: "1"
 
     - name: Install runtimes via mise (node, go)
       ansible.builtin.shell: |
