@@ -6,11 +6,12 @@ return {
     opts = {
       flavour = "mocha",
       integrations = {
-        blink_cmp = true,
+        cmp = true,
         treesitter = true,
         native_lsp = {
           enabled = true,
         },
+        blink_cmp = false,
       },
     },
   },

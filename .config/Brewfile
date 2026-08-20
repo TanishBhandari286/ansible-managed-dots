@@ -89,8 +89,6 @@ cask "font-jetbrains-mono"
 cask "gcloud-cli"
 # Terminal emulator that uses platform-native UI and GPU acceleration
 cask "ghostty"
-# Chromium-based web browser
-cask "helium-browser"
 # Free and open-source media player
 cask "iina"
 # Open-source software for live streaming and screen recording
@@ -109,10 +107,10 @@ cask "syncthing-app"
 cask "visual-studio-code"
 # Native desktop client for WhatsApp
 cask "whatsapp"
-# Multiplayer code editor
+# screenshot tool
+cask "macshot"
+cask "trex"
 cask "zap"
-cask "claude-code"
-cask "zed"
 vscode "commandcode.commandcode-vscode"
 vscode "formulahendry.code-runner"
 vscode "github.github-vscode-theme"
