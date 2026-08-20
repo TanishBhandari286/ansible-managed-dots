@@ -18,9 +18,15 @@ return {
         }),
         documentation = cmp.config.window.bordered({
           border = "single",
-          auto_show = false,
           winhighlight = "Normal:Normal,FloatBorder:FloatBorder,CursorLine:Visual,Search:None",
         }),
+      }
+
+      opts.experimental = {
+        -- Stop the doc popup from auto-opening on every selection while typing.
+        -- The window's own `auto_show` option is not honored by this nvim-cmp
+        -- version (window.bordered() drops unknown keys), so set it here.
+        auto_show = false,
       }
 
       opts.formatting = {
