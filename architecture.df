@@ -46,6 +46,7 @@ Targets [icon: monitor] {
 // ---- Flow: entry -> playbook --------------------------------------------
 Owner > install.sh: curl one-liner (macOS)
 Owner > linuxansible alias: manual run (personal Linux)
+Stranger > install.sh: same curl one-liner (macOS, no vault password)
 Stranger > bootstrap-public-linux.sh: curl one-liner (Linux only)
 
 install.sh > mac.yml: ansible-playbook (local)
@@ -54,7 +55,7 @@ bootstrap-public-linux.sh > public-linux.yml: installs ansible, clones over HTTP
 
 // ---- mac.yml: flat tasks, no shared roles --------------------------------
 mac.yml > Ansible Vault: decrypt owner's SSH keys (skipped if no .vault_pass)
-mac.yml > macOS Workstation: brew bundle, mise node/go, macOS defaults, install.sh
+mac.yml > macOS Workstation: brew bundle Brewfile (owner) or Brewfile.public (stranger), mise node/go, macOS defaults, install.sh
 
 // ---- linux.yml: full personal path, all roles including ssh -------------
 linux.yml > Shared Roles: packages, shell, node, docker, ssh, dotfiles

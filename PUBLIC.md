@@ -10,13 +10,15 @@ Trying this out on your own machine — no vault password, no keys, nothing owne
 
 ## macOS
 
-Same command the owner uses — Homebrew, all the tools, and the dotfiles install identically either way. You just don't have the vault password, so the SSH-key-decrypt step skips itself automatically:
+Same command the owner uses:
 
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/TanishBhandari286/ansible-managed-dots/main/install.sh)"
 ```
 
-**Homebrew itself gets installed first** if it isn't already on the machine — everything below is `brew bundle`'d from `.config/Brewfile` in one shot.
+You just don't have the vault password, so two things scale down automatically: the SSH-key-decrypt step skips itself, and `brew bundle` reads a smaller `.config/Brewfile.public` instead of the owner's full `Brewfile` — same CLI tools, but only 4 casks instead of 17, and no VS Code extensions (no point installing extensions for an editor that isn't installed).
+
+**Homebrew itself gets installed first** if it isn't already on the machine.
 
 CLI tools:
 
@@ -58,29 +60,16 @@ CLI tools:
 | `zsh-completions` | Extra completion definitions for zsh |
 | `zsh-syntax-highlighting` | Fish-style syntax highlighting for zsh |
 
-Apps (casks):
+Apps (casks) — curated down to the ones that don't assume an account or config that's specific to the owner:
 
 | Package | What it is |
 |---|---|
 | `aerospace` | i3-like tiling window manager |
-| `brave-browser` | Privacy-focused browser |
-| `font-jetbrains-mono` | JetBrains Mono monospace font |
-| `gcloud-cli` | Google Cloud SDK |
 | `ghostty` | GPU-accelerated terminal emulator |
 | `iina` | Media player |
-| `obs` | Screen recording / live streaming |
-| `obsidian` | Markdown knowledge base |
-| `omniwm` | Niri-inspired column-based tiling window manager |
-| `orbstack` | Docker Desktop replacement |
-| `raycast` | Launcher / productivity app |
-| `syncthing-app` | Peer-to-peer file sync |
-| `visual-studio-code` | Code editor |
-| `whatsapp` | Desktop WhatsApp client |
 | `macshot` | Screenshot / screen recording tool |
-| `trex` | Regex-based text extraction tool |
-| `zap` | OWASP ZAP — web app security scanner |
 
-Plus: Node 22 and Go installed via `mise`, `gopls` via `go install`, and `eslint`/`tree-sitter-cli` as npm globals. VS Code extensions (Python, Docker, Kubernetes, remote-SSH, themes) install from the same Brewfile.
+Plus: Node 22 and Go installed via `mise`, `gopls` via `go install`, and `eslint`/`tree-sitter-cli` as npm globals.
 
 ## Linux
 
