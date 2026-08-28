@@ -43,14 +43,39 @@
         executable: /bin/bash
       changed_when: false
 
-    - name: Check for vault password file
+    - name: Update Homebrew (refresh formula/cask index)
+      ansible.builtin.command: brew update
+      environment:
+        PATH: "/opt/homebrew/bin:{{ ansible_facts['env']['PATH'] }}"
+      changed_when: false
+
+    - name: Check for a vault password file at all
       ansible.builtin.stat:
         path: "{{ dots_dir }}/ansible/.vault_pass"
-      register: vault_pass_file
+      register: vault_pass_stat
+
+    - name: Check whether it actually decrypts
+      # bootstrap-mac.sh writes a dummy .vault_pass for non-owners so
+      # ansible-playbook can even start (ansible.cfg requires the file to
+      # exist). Its mere presence isn't proof of ownership — try an actual
+      # decrypt so a dummy password doesn't get treated as the real thing.
+      ansible.builtin.command:
+        cmd: "ansible-vault view {{ dots_dir }}/ssh_keys/id_ed25519_ansible"
+      register: vault_check
+      changed_when: false
+      failed_when: false
+      when: vault_pass_stat.stat.exists
+      environment:
+        PATH: "/opt/homebrew/bin:{{ ansible_facts['env']['PATH'] }}"
+        ANSIBLE_VAULT_PASSWORD_FILE: "{{ dots_dir }}/ansible/.vault_pass"
+
+    - name: Determine ownership
+      ansible.builtin.set_fact:
+        is_owner: "{{ vault_pass_stat.stat.exists and vault_check.rc is defined and vault_check.rc == 0 }}"
 
     - name: Pick Brewfile — full for the owner, curated subset otherwise
       ansible.builtin.set_fact:
-        brewfile: "{{ dots_dir }}/.config/{{ 'Brewfile' if vault_pass_file.stat.exists else 'Brewfile.public' }}"
+        brewfile: "{{ dots_dir }}/.config/{{ 'Brewfile' if is_owner else 'Brewfile.public' }}"
 
     - name: Install all bundles (brews, casks, taps, vscode)
       ansible.builtin.command:
@@ -109,13 +134,13 @@
         executable: /bin/bash
       changed_when: false
 
-    - name: Skip SSH key decryption (no vault password — not the repo owner)
+    - name: Skip SSH key decryption (not the repo owner)
       ansible.builtin.debug:
-        msg: "No ansible/.vault_pass found — skipping owner-only SSH key decryption."
-      when: not vault_pass_file.stat.exists
+        msg: "No working vault password — skipping owner-only SSH key decryption."
+      when: not is_owner
 
     - name: Decrypt SSH keys from Ansible Vault
-      when: vault_pass_file.stat.exists
+      when: is_owner
       ansible.builtin.shell: |
         set -euo pipefail
         mkdir -p "$HOME/.ssh"

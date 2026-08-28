@@ -13,12 +13,10 @@ Trying this out on your own machine — no vault password, no keys, nothing owne
 Same command the owner uses:
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/TanishBhandari286/ansible-managed-dots/main/install.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/TanishBhandari286/ansible-managed-dots/main/bootstrap-mac.sh)"
 ```
 
-You just don't have the vault password, so two things scale down automatically: the SSH-key-decrypt step skips itself, and `brew bundle` reads a smaller `.config/Brewfile.public` instead of the owner's full `Brewfile` — same CLI tools, but only 4 casks instead of 17, and no VS Code extensions (no point installing extensions for an editor that isn't installed).
-
-**Homebrew itself gets installed first** if it isn't already on the machine.
+It installs Homebrew and Ansible if either is missing, clones the repo, then runs the same `ansible-playbook playbooks/mac.yml` the owner uses. You just don't have a working vault password, so two things scale down automatically: the SSH-key-decrypt step skips itself, and `brew bundle` reads a smaller `.config/Brewfile.public` instead of the owner's full `Brewfile` — same CLI tools, but only 4 casks instead of 17, and no VS Code extensions (no point installing extensions for an editor that isn't installed). The script also runs an explicit `brew update` first, so you're never installing against a stale index.
 
 CLI tools:
 

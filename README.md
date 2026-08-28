@@ -9,7 +9,10 @@ Personal dotfiles + infrastructure-as-code. One repo, one tool — **Ansible** �
 ## Layout
 
 ```
-.zshrc, .config/, git/     # dotfiles, symlinked onto the target by install.sh
+bootstrap-mac.sh           # curl one-liner entry point — macOS
+bootstrap-public-linux.sh  # curl one-liner entry point — Linux
+install.sh                 # symlinks dotfiles; called by the playbooks, not run directly
+.zshrc, .config/, git/     # dotfiles, symlinked onto the target
 ansible/playbooks/         # mac.yml, linux.yml, public-linux.yml
 ansible/roles/             # packages, shell, node, docker, ssh, dotfiles
 ssh_keys/                  # SSH keys, Ansible Vault-encrypted at rest

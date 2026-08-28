@@ -11,15 +11,13 @@ For the repo owner — you hold `ansible/.vault_pass` and the vault-encrypted ke
 
 ## macOS
 
-SSH keys decrypt automatically because you have the vault password:
+Drop your vault password into `~/dots/ansible/.vault_pass` first if you haven't already — SSH keys only decrypt automatically when that's in place:
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/TanishBhandari286/ansible-managed-dots/main/install.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/TanishBhandari286/ansible-managed-dots/main/bootstrap-mac.sh)"
 ```
 
-Update anytime with the `macupdate` shell alias.
-
-**Homebrew itself gets installed first** if it isn't already on the machine — everything below is `brew bundle`'d from `.config/Brewfile` in one shot.
+This installs Homebrew and Ansible if either is missing, clones the repo, then runs `ansible-playbook playbooks/mac.yml` — which does everything below plus an explicit `brew update` before `brew bundle`, so you're never installing against a stale package index. Update anytime with the `macupdate` shell alias.
 
 CLI tools:
 

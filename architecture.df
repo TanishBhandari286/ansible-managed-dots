@@ -8,7 +8,7 @@ Owner [icon: user]
 Stranger [icon: user]
 
 Entry Points [icon: terminal] {
-  install.sh [icon: apple]
+  bootstrap-mac.sh [icon: apple]
   bootstrap-public-linux.sh [icon: linux]
   linuxansible alias [icon: terminal]
 }
@@ -44,17 +44,18 @@ Targets [icon: monitor] {
 }
 
 // ---- Flow: entry -> playbook --------------------------------------------
-Owner > install.sh: curl one-liner (macOS)
+Owner > bootstrap-mac.sh: curl one-liner (macOS) — needs .vault_pass placed first
 Owner > linuxansible alias: manual run (personal Linux)
-Stranger > install.sh: same curl one-liner (macOS, no vault password)
+Stranger > bootstrap-mac.sh: same curl one-liner (macOS, no vault password)
 Stranger > bootstrap-public-linux.sh: curl one-liner (Linux only)
 
-install.sh > mac.yml: ansible-playbook (local)
+bootstrap-mac.sh > mac.yml: installs brew+ansible, clones repo, hands off
 linuxansible alias > linux.yml: -i inventory/hosts.ini
 bootstrap-public-linux.sh > public-linux.yml: installs ansible, clones over HTTPS
 
 // ---- mac.yml: flat tasks, no shared roles --------------------------------
-mac.yml > Ansible Vault: decrypt owner's SSH keys (skipped if no .vault_pass)
+mac.yml > Ansible Vault: brew update, then try-decrypt a real vault file to
+  confirm ownership (a stranger's dummy .vault_pass doesn't fool this)
 mac.yml > macOS Workstation: brew bundle Brewfile (owner) or Brewfile.public (stranger), mise node/go, macOS defaults, install.sh
 
 // ---- linux.yml: full personal path, all roles including ssh -------------
