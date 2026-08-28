@@ -23,6 +23,10 @@ skip()   { printf '\033[0;33m  –\033[0m %s\n' "$*"; }
 info()   { printf '\033[0;34m  →\033[0m %s\n' "$*"; }
 dry()    { printf '\033[0;35m  ~\033[0m %s\n' "$*"; }
 
+banner() {
+  printf '\033[1;35m●\033[1;34m●\033[1;36m●\033[0m \033[1mdots\033[0m — laying down your config\n\n'
+}
+
 # ---- link -------------------------------------------------------------------
 #
 # link SRC DEST
@@ -63,17 +67,42 @@ link() {
   ok "$name"
 }
 
+# do_links "src1|dest1" "src2|dest2" ...
+# Numbers each link [n/total] so the count can't silently drift out of sync —
+# it's derived from the array itself, not hand-maintained.
+do_links() {
+  local pairs=("$@")
+  local total=${#pairs[@]}
+  local i=0 pair src dest
+  for pair in "${pairs[@]}"; do
+    i=$((i + 1))
+    src="${pair%%|*}"
+    dest="${pair#*|}"
+    printf '\033[2m  [%d/%d]\033[0m' "$i" "$total"
+    link "$src" "$dest"
+  done
+}
+
 # ---- run --------------------------------------------------------------------
 
+banner
 mkdir -p "$HOME/.config"
 
 # macOS was provisioned by nix-for-mac; now it's Ansible + Homebrew, same as
 # Linux. Symlink the dotfiles per-platform.
 if [[ "$OS" == "Darwin" ]]; then
-  echo ""
   echo "── macOS ────────────────────────────────────────────────────────────────"
-  link "$DOTS_DIR/.zshrc"                 "$HOME/.zshrc"
-  link "$DOTS_DIR/git/.gitconfig"         "$HOME/.gitconfig"
+  mkdir -p "$HOME/.config/tmux" "$HOME/.config/ghostty" "$HOME/.ssh"
+  do_links \
+    "$DOTS_DIR/.zshrc|$HOME/.zshrc" \
+    "$DOTS_DIR/git/.gitconfig|$HOME/.gitconfig" \
+    "$DOTS_DIR/.config/nvim|$HOME/.config/nvim" \
+    "$DOTS_DIR/.config/starship.toml|$HOME/.config/starship.toml" \
+    "$DOTS_DIR/.config/ghostty/config|$HOME/.config/ghostty/config" \
+    "$DOTS_DIR/.config/aerospace|$HOME/.config/aerospace" \
+    "$DOTS_DIR/.config/tmux/tmux.conf|$HOME/.config/tmux/tmux.conf" \
+    "$DOTS_DIR/ssh_keys/config|$HOME/.ssh/config"
+
   # ~/.gitconfig.local holds personal identity (name/email) — never overwrite
   # it; only seed from the example if it doesn't exist yet.
   if [[ ! -e "$HOME/.gitconfig.local" ]]; then
@@ -82,15 +111,9 @@ if [[ "$OS" == "Darwin" ]]; then
   else
     skip "~/.gitconfig.local exists — keeping your personal identity"
   fi
-  link "$DOTS_DIR/.config/nvim"           "$HOME/.config/nvim"
-  link "$DOTS_DIR/.config/starship.toml"  "$HOME/.config/starship.toml"
-  link "$DOTS_DIR/.config/ghostty/config" "$HOME/.config/ghostty/config"
-  link "$DOTS_DIR/.config/aerospace"      "$HOME/.config/aerospace"
-  mkdir -p "$HOME/.config/tmux"
-  link "$DOTS_DIR/.config/tmux/tmux.conf" "$HOME/.config/tmux/tmux.conf"
-  link "$DOTS_DIR/ssh_keys/config"        "$HOME/.ssh/config"
+
   echo ""
-  echo "Done. Run 'exec zsh' to reload your shell."
+  echo "All set. Run 'exec zsh' to reload your shell — welcome to dots. 🎉"
   exit 0
 fi
 
@@ -99,14 +122,14 @@ if [[ "$OS" != "Linux" ]]; then
   exit 1
 fi
 
-echo ""
 echo "── Linux ────────────────────────────────────────────────────────────────"
-link "$DOTS_DIR/.zshrc"                 "$HOME/.zshrc"
-link "$DOTS_DIR/git/.gitconfig"         "$HOME/.gitconfig"
-link "$DOTS_DIR/.config/nvim"           "$HOME/.config/nvim"
-link "$DOTS_DIR/.config/starship.toml"  "$HOME/.config/starship.toml"
 mkdir -p "$HOME/.config/tmux"
-link "$DOTS_DIR/.config/tmux/tmux.conf" "$HOME/.config/tmux/tmux.conf"
+do_links \
+  "$DOTS_DIR/.zshrc|$HOME/.zshrc" \
+  "$DOTS_DIR/git/.gitconfig|$HOME/.gitconfig" \
+  "$DOTS_DIR/.config/nvim|$HOME/.config/nvim" \
+  "$DOTS_DIR/.config/starship.toml|$HOME/.config/starship.toml" \
+  "$DOTS_DIR/.config/tmux/tmux.conf|$HOME/.config/tmux/tmux.conf"
 
 echo ""
-echo "Done. Run 'exec zsh' to reload your shell."
+echo "All set. Run 'exec zsh' to reload your shell — welcome to dots. 🎉"

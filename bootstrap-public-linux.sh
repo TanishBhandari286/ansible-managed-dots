@@ -8,20 +8,20 @@
 
 set -euo pipefail
 
-echo "=========================================================="
-echo "  Setting up your Linux machine (Public Mode)..."
-echo "=========================================================="
+# ---- output -----------------------------------------------------------------
+step() { printf '\n\033[1;36m▸ [%s/4] %s\033[0m\n' "$1" "$2"; }
+ok()   { printf '\033[0;32m  ✓ %s\033[0m\n' "$*"; }
 
-# Ask for the administrator password upfront
-echo "We need your password to install system packages..."
+printf '\033[1;35m●\033[1;34m●\033[1;36m●\033[0m \033[1mdots\033[0m — public mode, no keys required\n'
+echo "Ansible + Homebrew are about to make themselves at home on this box."
+
+step 1 "Installing Ansible"
+echo "Need your password once, up front, for system packages..."
 sudo -v
-
 # Keep-alive: update existing `sudo` time stamp until the script has finished
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
-# Install Ansible based on package manager
 if ! command -v ansible-playbook &> /dev/null; then
-    echo "Installing Ansible..."
     if command -v apt-get &> /dev/null; then
         sudo apt-get update
         sudo apt-get install -y software-properties-common
@@ -36,37 +36,34 @@ if ! command -v ansible-playbook &> /dev/null; then
         echo "Unsupported package manager. Please install Ansible manually."
         exit 1
     fi
+    ok "Ansible installed"
 else
-    echo "Ansible already installed."
+    ok "Ansible already installed"
 fi
 
-# Clone dotfiles repo via HTTPS
+step 2 "Fetching dots"
 DOTS_DIR="$HOME/dots"
 if [[ ! -d "$DOTS_DIR" ]]; then
-    echo "Cloning dotfiles repository..."
     git clone https://github.com/TanishBhandari286/ansible-managed-dots.git "$DOTS_DIR"
 else
-    echo "Dotfiles repository already exists at $DOTS_DIR."
+    echo "Already cloned at $DOTS_DIR — pulling latest."
     cd "$DOTS_DIR"
     git pull origin main
 fi
+ok "Repo ready at $DOTS_DIR"
 
-# Prepare Ansible
-echo "Preparing Ansible for Public Mode..."
+step 3 "Preparing vault-free Ansible config"
 cd "$DOTS_DIR/ansible"
-
 # Remove the private vault file so Ansible doesn't try to auto-decrypt it
 rm -f group_vars/all/vault.yml
-
 # Create a dummy vault password file to bypass the ansible.cfg requirement
 echo "public_mode_dummy_pass" > .vault_pass
 chmod 600 .vault_pass
+ok "No secrets in play — public-linux.yml never touches the owner's keys"
 
-echo "=========================================================="
-echo "Running Ansible Playbook (public-linux.yml)..."
+step 4 "Running the playbook"
+echo "This installs Homebrew, your shell, Docker, and dotfiles — sit tight."
 # No -K needed because our sudo keep-alive handles authentication
 ansible-playbook playbooks/public-linux.yml
 
-echo "=========================================================="
-echo "  Setup Complete! Restart your terminal."
-echo "=========================================================="
+printf '\n\033[1;35m●\033[1;34m●\033[1;36m●\033[0m \033[1mAll set.\033[0m Restart your terminal (or run '\''exec zsh'\'') and enjoy. 🎉\n'
