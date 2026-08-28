@@ -48,7 +48,6 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/TanishBhandari286/ansibl
 | Git | git, lazygit, delta |
 | Runtimes | mise (polyglot version manager), node@22, Python 3.14 |
 | Containers | Docker, lazydocker |
-| Coding agents | [omp](https://omp.sh) (oh-my-pi), [command-code](https://commandcode.ai) |
 | Theme | Tokyo Night (Storm) — zsh colors, fzf, and the Ghostty terminal all match |
 
 Everything with upstream releases is pulled from the **latest Homebrew release**, not the OS package manager — apt's versions of things like ripgrep/fd/bat/neovim lag behind, so brew is used for those directly. Only genuinely stable/base packages (curl, git, build-essential, etc.) come from apt on Linux; on macOS, Homebrew plays that role and tracks upstream closely on its own.

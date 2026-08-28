@@ -79,7 +79,7 @@
       ansible.builtin.shell: |
         set -euo pipefail
         eval "$(mise activate bash)"
-        npm install -g command-code@latest eslint@latest tree-sitter-cli@latest
+        npm install -g eslint@latest tree-sitter-cli@latest
       environment:
         PATH: "/opt/homebrew/bin:{{ ansible_facts['env']['PATH'] }}"
       changed_when: false

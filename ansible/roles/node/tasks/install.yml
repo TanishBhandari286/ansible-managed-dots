@@ -21,17 +21,3 @@
     PATH: "/home/linuxbrew/.linuxbrew/bin:{{ user_home }}/.local/bin:{{ ansible_facts['env']['PATH'] }}"
   become: false
   when: mise_check.rc == 0
-
-- name: Install/update command-code (coding agent) via npm
-  ansible.builtin.shell: |
-    set -euo pipefail
-    eval "$(mise activate bash)"
-    npm install -g command-code@latest
-  args:
-    executable: /bin/bash
-  environment:
-    HOME: "{{ user_home }}"
-    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ user_home }}/.local/bin:{{ ansible_facts['env']['PATH'] }}"
-  become: false
-  when: mise_check.rc == 0
-  tags: [command-code]

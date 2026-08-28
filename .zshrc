@@ -244,9 +244,6 @@ export VISUAL='nvim'
 # ---- Mise (polyglot runtime manager) ----------------------------------------
 command -v mise &>/dev/null && eval "$(mise activate zsh)"
 
-# ---- OMP (oh-my-pi coding agent) completions --------------------------------
-command -v omp &>/dev/null && eval "$(omp completions zsh)"
-
 # ---- Starship prompt ---------------------------------------------------------
 if command -v starship &>/dev/null; then
   export STARSHIP_CONFIG="$HOME/.config/starship.toml"
