@@ -1,51 +1,69 @@
 // Title
-Ansible Dotfiles Architecture
+dots — Provisioning Architecture
 
-// External Entities
-User [icon: user]
-GitHub Repository [icon: github]
+// Paste this into app.eraser.io (or the Eraser VS Code extension) to render.
 
-// Bootstrapping Phase
-Bootstrap Scripts [icon: terminal] {
-  install.sh
-  bootstrap-public-linux.sh
+// ---- Entry points -----------------------------------------------------
+Owner [icon: user]
+Stranger [icon: user]
+
+Entry Points [icon: terminal] {
+  install.sh [icon: apple]
+  bootstrap-public-linux.sh [icon: linux]
+  linuxansible alias [icon: terminal]
 }
 
-// Core Automation
-Ansible Provisioning [icon: settings] {
-  Playbooks [icon: list] {
-    mac.yml
-    linux.yml
-    public-linux.yml
-  }
-
-  Roles [icon: layers] {
-    packages [icon: package]
-    shell [icon: terminal]
-    node [icon: code]
-    docker [icon: box]
-    ssh [icon: key]
-    dotfiles [icon: file]
-  }
+// ---- Playbooks ----------------------------------------------------------
+Playbooks [icon: settings] {
+  mac.yml [icon: apple]
+  linux.yml [icon: server]
+  public-linux.yml [icon: server]
 }
 
-// Destinations
-Target Systems [icon: monitor] {
+// ---- Shared roles (linux.yml + public-linux.yml only — mac.yml has no roles) --
+Shared Roles [icon: layers] {
+  packages [icon: package]
+  shell [icon: terminal]
+  node [icon: code]
+  docker [icon: box]
+  ssh [icon: key]
+  dotfiles [icon: file]
+}
+
+// ---- Secrets --------------------------------------------------------------
+Ansible Vault [icon: lock] {
+  ssh_keys/id_* (encrypted)
+  ansible/.vault_pass (gitignored, owner-only)
+}
+
+// ---- Targets ----------------------------------------------------------------
+Targets [icon: monitor] {
   macOS Workstation [icon: monitor]
-  Linux Server [icon: server]
+  vps / master-node / cp / dp [icon: server]
+  localhost (public mode) [icon: monitor]
 }
 
-// Execution Flow
-User > Bootstrap Scripts: Executes via curl bash
-Bootstrap Scripts > GitHub Repository: Clones dots repo
-Bootstrap Scripts > Ansible Provisioning: Triggers Ansible Playbook
+// ---- Flow: entry -> playbook --------------------------------------------
+Owner > install.sh: curl one-liner (macOS)
+Owner > linuxansible alias: manual run (personal Linux)
+Stranger > bootstrap-public-linux.sh: curl one-liner (Linux only)
 
-Ansible Provisioning > Playbooks: Orchestrates execution
+install.sh > mac.yml: ansible-playbook (local)
+linuxansible alias > linux.yml: -i inventory/hosts.ini
+bootstrap-public-linux.sh > public-linux.yml: installs ansible, clones over HTTPS
 
-// Role Actions
-packages > Target Systems: Installs Homebrew + brew packages
-shell > Target Systems: Sets up Zsh as default shell
-node > Target Systems: Installs Node.js 22 via mise
-docker > Linux Server: Configures Docker runtime
-ssh > Target Systems: Installs Private SSH Keys (Owner only)
-dotfiles > Target Systems: Symlinks configuration files
+// ---- mac.yml: flat tasks, no shared roles --------------------------------
+mac.yml > Ansible Vault: decrypt owner's SSH keys (skipped if no .vault_pass)
+mac.yml > macOS Workstation: brew bundle, mise node/go, macOS defaults, install.sh
+
+// ---- linux.yml: full personal path, all roles including ssh -------------
+linux.yml > Shared Roles: packages, shell, node, docker, ssh, dotfiles
+ssh > Ansible Vault: deploy automation key + FIDO2 keys to target
+Shared Roles > vps / master-node / cp / dp: provisions the real inventoried hosts
+
+// ---- public-linux.yml: same roles minus ssh, no vault ever touched -------
+public-linux.yml > Shared Roles: packages, shell, node, docker, dotfiles
+Shared Roles > localhost (public mode): provisions the machine you're on
+
+// ---- dotfiles role always closes the loop --------------------------------
+dotfiles > Targets: git clone this repo + run install.sh to symlink configs

@@ -101,7 +101,18 @@
         executable: /bin/bash
       changed_when: false
 
+    - name: Check for vault password file
+      ansible.builtin.stat:
+        path: "{{ dots_dir }}/ansible/.vault_pass"
+      register: vault_pass_file
+
+    - name: Skip SSH key decryption (no vault password — not the repo owner)
+      ansible.builtin.debug:
+        msg: "No ansible/.vault_pass found — skipping owner-only SSH key decryption."
+      when: not vault_pass_file.stat.exists
+
     - name: Decrypt SSH keys from Ansible Vault
+      when: vault_pass_file.stat.exists
       ansible.builtin.shell: |
         set -euo pipefail
         mkdir -p "$HOME/.ssh"
