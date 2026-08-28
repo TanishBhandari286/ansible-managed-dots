@@ -12,8 +12,8 @@ key-mapping.preset = 'qwerty'
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
 # config-version 2 no longer infers persistent workspaces from keybindings —
-# declare them explicitly to keep workspaces 1-10 pinned to their monitors.
-persistent-workspaces = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+# declare them explicitly to keep workspaces 1-9 pinned to their monitors.
+persistent-workspaces = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
 [gaps]
 inner.horizontal = 10
 inner.vertical =   10
@@ -51,15 +51,13 @@ alt-p = 'focus-monitor prev'
 alt-shift-n = 'move-node-to-monitor next'
 alt-shift-p = 'move-node-to-monitor prev'
 
-# Workspaces 7-10 (for external monitor)
+# Workspaces 7-9 (for external monitor)
 alt-7 = 'workspace 7'
 alt-8 = 'workspace 8'
 alt-9 = 'workspace 9'
-alt-0 = 'workspace 10'
 alt-shift-7 = 'move-node-to-workspace 7'
 alt-shift-8 = 'move-node-to-workspace 8'
 alt-shift-9 = 'move-node-to-workspace 9'
-alt-shift-0 = 'move-node-to-workspace 10'
 alt-shift-semicolon = 'mode service'
 [mode.service.binding]
 esc = ['reload-config', 'mode main']
@@ -82,5 +80,4 @@ alt-shift-l = ['join-with right', 'mode main']
 7 = 'secondary'
 8 = 'secondary'
 9 = 'secondary'
-10 = 'secondary'
 
