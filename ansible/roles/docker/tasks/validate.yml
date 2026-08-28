@@ -24,3 +24,6 @@
   ansible.builtin.command: docker run --rm hello-world
   changed_when: false
   become: true
+  # Opt-in only (needs --tags docker_smoke_test or --tags all) — not worth
+  # paying on every routine provisioning run once Docker is known-good.
+  tags: [docker_smoke_test, never]

@@ -1,16 +1,13 @@
 ---
 
-- name: Fetch GitHub host key via ssh-keyscan
-  ansible.builtin.command:
-    cmd: ssh-keyscan -t ed25519 github.com
-  register: github_hostkey
-  changed_when: false
-  become: false
-
 - name: Add GitHub host key to ~/.ssh/known_hosts
+  # Hardcoded, not fetched via ssh-keyscan — GitHub publishes this ed25519 key
+  # as stable (https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/githubs-ssh-key-fingerprints).
+  # Trusting whatever ssh-keyscan returns at provision time is trust-on-first-use
+  # and offers no protection against a MITM during that scan.
   ansible.builtin.known_hosts:
     name: github.com
-    key: "{{ github_hostkey.stdout_lines | select('search', 'ssh-ed25519') | first }}"
+    key: "github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl"
     path: "{{ user_home }}/.ssh/known_hosts"
     state: present
   become: false
@@ -20,7 +17,7 @@
     path: "{{ user_home }}/.ssh/config"
     state: touch
     mode: "0600"
-    owner: "{{ ansible_user }}"
+    owner: "{{ target_user }}"
     modification_time: preserve
     access_time: preserve
   become: false

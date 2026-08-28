@@ -5,7 +5,7 @@
     src: "{{ lookup('env', 'HOME') }}/dots/ssh_keys/{{ ssh_automation_key }}"
     dest: "{{ user_home }}/.ssh/{{ ssh_automation_key }}"
     mode: "0600"
-    owner: "{{ ansible_user }}"
+    owner: "{{ target_user }}"
   become: false
   no_log: true
   tags: [ssh_automation, ssh_keys_private]
@@ -15,6 +15,6 @@
     src: "{{ lookup('env', 'HOME') }}/dots/ssh_keys/{{ ssh_automation_key }}.pub"
     dest: "{{ user_home }}/.ssh/{{ ssh_automation_key }}.pub"
     mode: "0644"
-    owner: "{{ ansible_user }}"
+    owner: "{{ target_user }}"
   become: false
   tags: [ssh_automation, ssh_keys_public]

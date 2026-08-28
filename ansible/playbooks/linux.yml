@@ -17,9 +17,10 @@
       when: ansible_facts['os_family'] == "Debian"
       become: true
 
-    - name: Set user_home
+    - name: Set user_home and target_user
       ansible.builtin.set_fact:
         user_home: "/home/{{ ansible_user }}"
+        target_user: "{{ ansible_user }}"
 
   roles:
     - { role: packages,  become: true,  tags: [packages, apt] }

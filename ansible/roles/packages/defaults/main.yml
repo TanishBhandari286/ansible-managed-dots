@@ -25,6 +25,9 @@ brew_packages:
   - fzf
   - zsh-syntax-highlighting
   - zsh-autosuggestions
+  - zsh-completions
+  - lazygit
+  - git-delta
   # Runtimes — mise manages node
   - python@3.14
 
