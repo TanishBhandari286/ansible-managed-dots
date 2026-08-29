@@ -170,9 +170,25 @@ ZSH_AUTOSUGGEST_USE_ASYNC=true
 bindkey '^ ' autosuggest-accept                        # CTRL+Space → accept full suggestion
 bindkey '^]' autosuggest-execute                       # CTRL+] → accept + execute
 
+# ---- Cached shell-init scripts -----------------------------------------------
+# zoxide/starship generate their init code by running the binary on every
+# shell startup. Cache the generated script and only regenerate it when the
+# binary itself changes, to skip the repeated fork+exec cost. (mise is NOT
+# cached this way — see the note near its activation below.)
+ZSH_INIT_CACHE="$HOME/.cache/zsh-init"
+mkdir -p "$ZSH_INIT_CACHE"
+_zsh_cached_init() {
+  local name="$1" bin="$2" cache="$ZSH_INIT_CACHE/$1.zsh"
+  shift 2
+  if [[ ! -s "$cache" || "$bin" -nt "$cache" ]]; then
+    "$bin" "$@" > "$cache" 2>/dev/null
+  fi
+  source "$cache"
+}
+
 # ---- Zoxide -----------------------------------------------------------------
 if command -v zoxide &>/dev/null; then
-  eval "$(zoxide init zsh --cmd cd)"
+  _zsh_cached_init zoxide "$(command -v zoxide)" init zsh --cmd cd
   # zi = interactive directory picker with fzf
 fi
 
@@ -242,15 +258,21 @@ export VISUAL='nvim'
 [[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
 
 # ---- Mise (polyglot runtime manager) ----------------------------------------
+# Not cached like zoxide/starship below: mise's generated script embeds a
+# snapshot of $PATH at generation time, so caching it would freeze a stale
+# PATH into every future shell instead of the one built earlier in this file.
 command -v mise &>/dev/null && eval "$(mise activate zsh)"
 
 # ---- Starship prompt ---------------------------------------------------------
 if command -v starship &>/dev/null; then
   export STARSHIP_CONFIG="$HOME/.config/starship.toml"
-  eval "$(starship init zsh)"
+  _zsh_cached_init starship "$(command -v starship)" init zsh
 fi
+
+unset -f _zsh_cached_init
 
 # ---- Local overrides --------------------------------------------------------
 # Source a local, machine-specific file that is NOT committed to the repo.
 # Use this for secrets, API keys, or per-machine customizations.
 [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
+[ -f "/Users/devops/.config/pi/secrets.env" ] && source "/Users/devops/.config/pi/secrets.env"
