@@ -26,7 +26,7 @@ Host master-node
     IdentityFile ~/.ssh/id_ed25519_ansible
 
 Host dp-2
-    HostName 192.168.29.7
+    HostName 192.168.29.9
     User dp-2
     IdentityFile ~/.ssh/id_ed25519_ansible
 

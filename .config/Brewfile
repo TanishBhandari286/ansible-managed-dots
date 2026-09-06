@@ -60,6 +60,7 @@ brew "starship"
 brew "tmux"
 # Upgrade all the things
 brew "topgrade"
+brew "whisper-cpp"
 # Extremely fast Python package installer and resolver, written in Rust
 brew "uv"
 # Internet file retriever
