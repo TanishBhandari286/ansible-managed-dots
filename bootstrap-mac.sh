@@ -13,7 +13,7 @@
 
 set -euo pipefail
 
-step() { printf '\n\033[1;36m▸ [%s/3] %s\033[0m\n' "$1" "$2"; }
+step() { printf '\n\033[1;36m▸ [%s/4] %s\033[0m\n' "$1" "$2"; }
 ok()   { printf '\033[0;32m  ✓ %s\033[0m\n' "$*"; }
 
 printf '\033[1;35m●\033[1;34m●\033[1;36m●\033[0m \033[1mdots\033[0m — macOS setup, owner or not\n'
@@ -61,7 +61,11 @@ else
   ok "Vault password found — running as the owner"
 fi
 
-step 3 "Running the playbook"
+step 3 "Installing required Ansible collections"
+ansible-galaxy collection install -r requirements.yml
+ok "Collections installed"
+
+step 4 "Running the playbook"
 echo "This installs Homebrew packages, applies macOS defaults, and symlinks dotfiles — sit tight."
 ansible-playbook playbooks/mac.yml
 

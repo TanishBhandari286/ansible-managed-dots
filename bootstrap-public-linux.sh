@@ -9,7 +9,7 @@
 set -euo pipefail
 
 # ---- output -----------------------------------------------------------------
-step() { printf '\n\033[1;36m▸ [%s/4] %s\033[0m\n' "$1" "$2"; }
+step() { printf '\n\033[1;36m▸ [%s/5] %s\033[0m\n' "$1" "$2"; }
 ok()   { printf '\033[0;32m  ✓ %s\033[0m\n' "$*"; }
 
 printf '\033[1;35m●\033[1;34m●\033[1;36m●\033[0m \033[1mdots\033[0m — public mode, no keys required\n'
@@ -54,14 +54,18 @@ ok "Repo ready at $DOTS_DIR"
 
 step 3 "Preparing vault-free Ansible config"
 cd "$DOTS_DIR/ansible"
-# Remove the private vault file so Ansible doesn't try to auto-decrypt it
-rm -f group_vars/all/vault.yml
-# Create a dummy vault password file to bypass the ansible.cfg requirement
+# Dummy vault password file to satisfy ansible.cfg's vault_password_file
+# requirement. public-linux.yml never references a vault-encrypted var, so
+# this password is only ever "used" to not be used.
 echo "public_mode_dummy_pass" > .vault_pass
 chmod 600 .vault_pass
 ok "No secrets in play — public-linux.yml never touches the owner's keys"
 
-step 4 "Running the playbook"
+step 4 "Installing required Ansible collections"
+ansible-galaxy collection install -r requirements.yml
+ok "Collections installed"
+
+step 5 "Running the playbook"
 echo "This installs Homebrew, your shell, Docker, and dotfiles — sit tight."
 # No -K needed because our sudo keep-alive handles authentication
 ansible-playbook playbooks/public-linux.yml
