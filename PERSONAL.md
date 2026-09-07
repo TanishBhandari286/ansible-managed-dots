@@ -6,7 +6,7 @@ For the repo owner — you hold `ansible/.vault_pass` and the vault-encrypted ke
 
 - Your real SSH keys — `id_ed25519_ansible` (automation) and your FIDO2 keys — decrypted into `~/.ssh`
 - Your git identity from `~/.gitconfig.local`
-- On Linux: the actual inventoried hosts (`vps`, `master-node`, `cp`, `dp`) get provisioned, not just the machine you're sitting at
+- On Linux: the actual inventoried hosts (`vps`, `master-node`, `dp-2`, `dp`) get provisioned, not just the machine you're sitting at
 - The `ssh` role: GitHub's host key pinned, automation key deployed to every server so future `dotfiles` pulls need no password
 
 ## macOS
