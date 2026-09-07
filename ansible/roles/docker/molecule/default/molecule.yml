@@ -1,0 +1,4 @@
+---
+# Inherits driver / platform / provisioner from ansible/.config/molecule/config.yml
+scenario:
+  name: default

@@ -1,0 +1,28 @@
+---
+# Shared by the CI `lint` job, pre-commit, and ansible-lint's internal yaml rule.
+extends: default
+
+ignore: |
+  ansible/collections/
+  **/molecule/*/molecule.yml
+
+rules:
+  # Ansible tasks and status-line strings get long; flag but don't fail.
+  line-length:
+    max: 200
+    level: warning
+  # `state: present` etc. are strings; only real booleans must be true/false.
+  truthy:
+    allowed-values: ["true", "false"]
+    check-keys: false
+  comments:
+    min-spaces-from-content: 1
+  comments-indentation: disable
+  document-start:
+    present: true
+  braces:
+    max-spaces-inside: 1
+  # `mode: "0644"` must stay quoted — catch bare octal that YAML would eat.
+  octal-values:
+    forbid-implicit-octal: true
+    forbid-explicit-octal: true

@@ -1,0 +1,20 @@
+---
+- name: Verify — docker role
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: docker --version succeeds
+      ansible.builtin.command: docker --version
+      register: docker_v
+      changed_when: false
+
+    - name: docker compose plugin is present
+      ansible.builtin.command: docker compose version
+      register: compose_v
+      changed_when: false
+
+    - name: Report
+      ansible.builtin.debug:
+        msg:
+          - "{{ docker_v.stdout }}"
+          - "{{ compose_v.stdout }}"

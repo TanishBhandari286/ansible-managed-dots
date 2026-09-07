@@ -1,0 +1,11 @@
+---
+- name: Converge — packages role
+  hosts: all
+  gather_facts: true
+  vars:
+    target_user: root
+    user_home: /root
+  tasks:
+    - name: Run the packages role
+      ansible.builtin.include_role:
+        name: packages

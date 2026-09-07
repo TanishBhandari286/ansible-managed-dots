@@ -1,0 +1,52 @@
+---
+# Install with:  pre-commit install   (or `just hooks`)
+# Run manually:  pre-commit run --all-files
+minimum_pre_commit_version: "3.5.0"
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+        exclude: '\.md$'
+      - id: mixed-line-ending
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: [--maxkb=512]
+      - id: check-executables-have-shebangs
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+        exclude: '^ansible/.*/molecule/.*$'
+
+  # Stop plaintext secrets landing in a commit. Scans the staged diff only,
+  # so the existing vault ciphertext in ssh_keys/ is not re-flagged.
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.21.2
+    hooks:
+      - id: gitleaks
+
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.10.0.1
+    hooks:
+      - id: shellcheck
+        args: [-S, warning]
+
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        args: [-c, .yamllint]
+
+  - repo: https://github.com/ansible/ansible-lint
+    rev: v24.9.2
+    hooks:
+      - id: ansible-lint
+        files: '^ansible/.*\.(ya?ml)$'
+
+  - repo: https://github.com/JohnnyMorganz/StyLua
+    rev: v2.0.2
+    hooks:
+      - id: stylua-github
+        args: [--config-path, .config/nvim/stylua.toml]
+        files: '^\.config/nvim/.*\.lua$'

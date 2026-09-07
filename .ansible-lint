@@ -1,0 +1,26 @@
+---
+# Pragmatic starting point. The `basic` profile catches real breakage,
+# deprecations, and undefined-variable bugs without burying the first CI
+# run in style nits.
+#
+# The skip_list below is deliberately temporary — every entry corresponds
+# to a known item in the audit follow-up (convert shell blocks to native
+# modules, add real change detection). Delete entries as those land and
+# walk the profile up toward `safety` / `production`.
+profile: basic
+
+exclude_paths:
+  - .cache/
+  - .github/
+  - ansible/collections/
+  - ansible/.config/
+  - "**/molecule/"
+
+skip_list:
+  - command-instead-of-shell   # brew/mise/npm wrappers — tier-2 refactor
+  - no-changed-when            # blanket `changed_when: false` — tier-2 refactor
+  - package-latest             # mise/npm "@latest" is intentional here
+
+warn_list:
+  - risky-shell-pipe           # bootstrap scripts curl|bash the Homebrew installer by design
+  - yaml[line-length]

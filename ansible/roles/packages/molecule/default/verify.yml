@@ -1,0 +1,20 @@
+---
+- name: Verify — packages role
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Homebrew is on PATH
+      ansible.builtin.command: /home/linuxbrew/.linuxbrew/bin/brew --version
+      register: brew_v
+      changed_when: false
+
+    - name: A representative brew package is installed (ripgrep)
+      ansible.builtin.command: /home/linuxbrew/.linuxbrew/bin/rg --version
+      register: rg_v
+      changed_when: false
+
+    - name: Report
+      ansible.builtin.debug:
+        msg:
+          - "{{ brew_v.stdout_lines[0] }}"
+          - "{{ rg_v.stdout_lines[0] }}"
