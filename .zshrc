@@ -219,7 +219,7 @@ alias gl='git log --oneline --graph --decorate --all'
 alias gd='git diff'
 alias ga='git add .'
 alias gc='git commit'
-alias gp='git push -u origin main'
+alias gp='git push'                     # first push of a branch auto-creates upstream (push.autoSetupRemote)
 alias gpl='git pull'
 alias gb='git branch'
 alias gco='git checkout'
@@ -275,4 +275,4 @@ unset -f _zsh_cached_init
 # Source a local, machine-specific file that is NOT committed to the repo.
 # Use this for secrets, API keys, or per-machine customizations.
 [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
-[ -f "/Users/devops/.config/pi/secrets.env" ] && source "/Users/devops/.config/pi/secrets.env"
+[[ -f "$HOME/.config/pi/secrets.env" ]] && source "$HOME/.config/pi/secrets.env"

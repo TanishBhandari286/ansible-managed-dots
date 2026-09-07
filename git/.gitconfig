@@ -2,9 +2,75 @@
 # Personal details (name, email, signing key) go in ~/.gitconfig.local.
 # Copy git/.gitconfig.local.example as a starting point.
 
-[pull]
-	rebase = true
-[gpg]
-	format = ssh
 [include]
 	path = ~/.gitconfig.local
+
+[init]
+	defaultBranch = main
+
+[pull]
+	rebase = true
+
+[push]
+	# First push of a new branch creates its upstream automatically —
+	# no more `git push -u origin <branch>`.
+	autoSetupRemote = true
+	followTags = true
+
+[fetch]
+	prune = true
+	pruneTags = true
+
+[rebase]
+	autoStash = true
+	updateRefs = true
+
+[merge]
+	# 3-way conflict markers that also show the common ancestor.
+	conflictStyle = zdiff3
+
+[rerere]
+	# Remember how conflicts were resolved and replay them next time.
+	enabled = true
+
+[diff]
+	algorithm = histogram
+	colorMoved = default
+	colorMovedWS = allow-indentation-change
+	mnemonicPrefix = true
+	renames = copies
+
+[gpg]
+	format = ssh
+
+# ---- git-delta: syntax-highlighted diffs / pager -------------------------
+# Installed via Homebrew (see .config/Brewfile). If delta ever isn't on the
+# box, git falls back to the built-in pager gracefully.
+[core]
+	pager = delta
+
+[interactive]
+	diffFilter = delta --color-only
+
+[delta]
+	navigate = true          # n / N to jump between files in the diff
+	line-numbers = true
+	hyperlinks = true
+	syntax-theme = Nord
+
+[delta "decorations"]
+	commit-decoration-style = blue ol
+	file-style = omit
+	hunk-header-decoration-style = blue box
+
+[merge "delta"]
+	conflictstyle = zdiff3
+
+[column]
+	ui = auto
+
+[branch]
+	sort = -committerdate
+
+[tag]
+	sort = version:refname
