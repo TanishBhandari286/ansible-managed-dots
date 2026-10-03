@@ -24,12 +24,14 @@ vim.g.clipboard = {
 }
 
 -- LazyVim defers clipboard handling at startup (clears the option, then
--- restores it on VeryLazy). That restore can leave `clipboard` empty if it
--- doesn't fire, which silently disables yank-to-clipboard. Re-apply it here,
--- after LazyVim's init, so yanks always route to the + register (OSC 52).
-vim.api.nvim_create_autocmd("User", {
-  pattern = "VeryLazy",
-  callback = function()
-    vim.opt.clipboard = "unnamedplus"
-  end,
-})
+-- restores it later) to dodge the cost of probing for a system clipboard
+-- tool. That cost doesn't apply here -- the provider above is a pure OSC 52
+-- escape-sequence writer, nothing to probe -- so there's no reason to defer.
+--
+-- This used to re-apply `unnamedplus` on the `User VeryLazy` autocmd,
+-- trying to win a race against LazyVim's own restore. Confirmed by
+-- directly querying `:set clipboard?` after startup: that race was lost in
+-- practice -- `clipboard` came back empty, so plain `y` never reached the
+-- osc52 provider at all. Set it synchronously instead; this file already
+-- runs after LazyVim's own options module, so there's no race to lose.
+vim.opt.clipboard = "unnamedplus"
